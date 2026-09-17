@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block titulo %}Nuevo producto{% endblock %}
+{% block contenido %}
+<p><a href="/productos">Volver a productos</a></p>
+<h1>Nuevo producto</h1>
+
+{% if not unidades %}
+  <p class="error">No hay unidades registradas. Ejecuta scripts/datos_iniciales.py</p>
+{% endif %}
+{% if error %}<p class="error">{{ error }}</p>{% endif %}
+
+<form class="campos" method="post" action="/productos/nuevo">
+  <label>Código
+    <input name="codigo" required maxlength="30" value="{{ datos.codigo or '' }}">
+  </label>
+  <label>Descripción
+    <input name="descripcion" required maxlength="200" value="{{ datos.descripcion or '' }}">
+  </label>
+  <label>Unidad de venta
+    <select name="unidad_id" required>
+      {% for u in unidades %}
+      <option value="{{ u.id }}" {% if datos.unidad_id == u.id %}selected{% endif %}>
+        {{ u.nombre }} ({{ u.clave }})
+      </option>
+      {% endfor %}
+    </select>
+  </label>
+  <label>Precio inicial (opcional)
+    <input name="precio" inputmode="decimal" value="{{ datos.precio or '' }}">
+  </label>
+  <button type="submit">Guardar</button>
+</form>
+{% endblock %}

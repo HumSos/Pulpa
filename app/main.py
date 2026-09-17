@@ -2,17 +2,16 @@ from pathlib import Path
 
 from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
 from sqlalchemy import text
 
 from app.config import settings
+from app.web import productos
 from app.web.deps import DbSession
-
-WEB_DIR = Path(__file__).parent / "web"
+from app.web.plantillas import templates
 
 app = FastAPI(title=settings.app_nombre)
-app.mount("/static", StaticFiles(directory=WEB_DIR / "static"), name="static")
-templates = Jinja2Templates(directory=WEB_DIR / "templates")
+app.mount("/static", StaticFiles(directory=Path(__file__).parent / "web" / "static"), name="static")
+app.include_router(productos.router)
 
 
 @app.get("/")

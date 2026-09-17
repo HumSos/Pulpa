@@ -1,0 +1,10 @@
+{% for p in productos %}
+<tr>
+  <td><a href="/productos/{{ p.id }}">{{ p.codigo }}</a></td>
+  <td>{{ p.descripcion }}</td>
+  <td>{{ p.unidad.clave }}</td>
+  <td class="num">{{ precios[p.id] | dinero if p.id in precios else "Sin precio" }}</td>
+</tr>
+{% else %}
+<tr><td colspan="4">No hay productos{% if q %} que coincidan con "{{ q }}"{% endif %}.</td></tr>
+{% endfor %}

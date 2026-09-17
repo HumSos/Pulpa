@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block titulo %}{{ producto.codigo }}{% endblock %}
+{% block contenido %}
+<p><a href="/productos">Volver a productos</a></p>
+<h1>{{ producto.codigo }} · {{ producto.descripcion }}</h1>
+<p>Unidad de venta: {{ producto.unidad.nombre }}</p>
+
+<section id="precios">{% include "productos/_precios.html" %}</section>
+{% endblock %}

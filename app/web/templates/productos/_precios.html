@@ -1,0 +1,31 @@
+<h2>Precio de venta</h2>
+<p>Vigente hoy: <strong>{{ vigente.precio | dinero if vigente else "Sin precio" }}</strong></p>
+{% if error %}<p class="error">{{ error }}</p>{% endif %}
+
+<form class="en-linea" hx-post="/productos/{{ producto.id }}/precios" hx-target="#precios">
+  <label>Nuevo precio
+    <input name="precio" inputmode="decimal" required>
+  </label>
+  <label>Vigente desde (vacío = ahora)
+    <input type="datetime-local" name="vigente_desde">
+  </label>
+  <button type="submit">Registrar</button>
+</form>
+
+<table>
+  <thead><tr><th>Vigente desde</th><th class="num">Precio</th><th></th></tr></thead>
+  <tbody>
+  {% for p in historial %}
+    <tr>
+      <td>{{ p.vigente_desde.strftime("%d/%m/%Y %H:%M") }}</td>
+      <td class="num">{{ p.precio | dinero }}</td>
+      <td>
+        {% if p.vigente_desde > ahora %}<span class="etiqueta">Programado</span>
+        {% elif vigente and p.id == vigente.id %}<span class="etiqueta">Vigente</span>{% endif %}
+      </td>
+    </tr>
+  {% else %}
+    <tr><td colspan="3">Aún no hay precios registrados.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>

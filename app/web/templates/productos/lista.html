@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block titulo %}Productos{% endblock %}
+{% block contenido %}
+<div class="encabezado">
+  <h1>Productos</h1>
+  <a class="boton" href="/productos/nuevo">Nuevo producto</a>
+</div>
+
+<input type="search" name="q" value="{{ q }}" placeholder="Buscar por código o descripción"
+       hx-get="/productos" hx-trigger="input changed delay:300ms, search" hx-target="#filas">
+
+<table>
+  <thead>
+    <tr><th>Código</th><th>Descripción</th><th>Unidad</th><th class="num">Precio vigente</th></tr>
+  </thead>
+  <tbody id="filas">{% include "productos/_filas.html" %}</tbody>
+</table>
+{% endblock %}
