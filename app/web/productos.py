@@ -1,5 +1,4 @@
 from datetime import datetime
-from decimal import Decimal, InvalidOperation
 from typing import Annotated
 
 from fastapi import APIRouter, Form, HTTPException, Request
@@ -10,28 +9,12 @@ from sqlalchemy.orm import Session
 from app.modelos import Producto
 from app.servicios import catalogo
 from app.web.deps import DbSession
+from app.web.formularios import leer_decimal, leer_fecha
 from app.web.plantillas import templates
 
 router = APIRouter(prefix="/productos", tags=["productos"])
 
 
-def leer_decimal(texto: str) -> Decimal | None:
-    texto = texto.strip().replace(",", "")
-    if not texto:
-        return None
-    try:
-        return Decimal(texto)
-    except InvalidOperation as exc:
-        raise catalogo.DatoInvalidoError(f"'{texto}' no es un número válido") from exc
-
-
-def leer_fecha(texto: str) -> datetime | None:
-    if not texto:
-        return None
-    try:
-        return datetime.fromisoformat(texto)
-    except ValueError as exc:
-        raise catalogo.DatoInvalidoError("La fecha no es válida") from exc
 
 
 def _obtener(db: Session, producto_id: int) -> Producto:

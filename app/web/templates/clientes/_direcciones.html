@@ -1,0 +1,29 @@
+<h2>Direcciones de entrega</h2>
+{% if error %}<p class="error">{{ error }}</p>{% endif %}
+
+<table>
+  <thead><tr><th>Alias</th><th>Dirección</th><th>Referencia</th><th></th></tr></thead>
+  <tbody>
+  {% for d in direcciones %}
+    <tr>
+      <td>{{ d.alias }}</td>
+      <td>{{ d.direccion }}</td>
+      <td>{{ d.referencia or "" }}</td>
+      <td>
+        <button class="secundario" hx-target="#direcciones"
+                hx-post="/clientes/{{ cliente.id }}/direcciones/{{ d.id }}/desactivar"
+                hx-confirm="¿Quitar la dirección {{ d.alias }}?">Quitar</button>
+      </td>
+    </tr>
+  {% else %}
+    <tr><td colspan="4">Sin direcciones adicionales. Los pedidos usarán la dirección principal.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+<form class="en-linea" hx-post="/clientes/{{ cliente.id }}/direcciones" hx-target="#direcciones">
+  <label>Alias <input name="alias" required maxlength="60" placeholder="Sucursal centro"></label>
+  <label>Dirección <input name="direccion" required maxlength="300"></label>
+  <label>Referencia <input name="referencia" maxlength="300"></label>
+  <button type="submit">Agregar</button>
+</form>

@@ -1,0 +1,10 @@
+{% for c in clientes %}
+<tr>
+  <td><a href="/clientes/{{ c.id }}">{{ c.nombre_negocio }}</a></td>
+  <td>{{ c.nombre_contacto or "" }}</td>
+  <td>{{ c.telefono or "" }}</td>
+  <td class="num">{{ "Contado" if c.dias_credito == 0 else c.dias_credito ~ " días" }}</td>
+</tr>
+{% else %}
+<tr><td colspan="4">No hay clientes{% if q %} que coincidan con "{{ q }}"{% endif %}.</td></tr>
+{% endfor %}

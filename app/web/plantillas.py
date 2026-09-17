@@ -1,6 +1,7 @@
 from decimal import Decimal
 from pathlib import Path
 
+from fastapi import Request
 from fastapi.templating import Jinja2Templates
 
 templates = Jinja2Templates(directory=Path(__file__).parent / "templates")
@@ -16,3 +17,7 @@ def dinero(valor: Decimal | None) -> str:
 
 
 templates.env.filters["dinero"] = dinero
+
+
+def es_htmx(request: Request) -> bool:
+    return request.headers.get("HX-Request") == "true"

@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block titulo %}Nuevo cliente{% endblock %}
+{% block contenido %}
+<p><a href="/clientes">Volver a clientes</a></p>
+<h1>Nuevo cliente</h1>
+{% if error %}<p class="error">{{ error }}</p>{% endif %}
+
+<form class="campos" method="post" action="/clientes/nuevo">
+  {% include "clientes/_campos.html" %}
+  <button type="submit">Guardar</button>
+</form>
+{% endblock %}

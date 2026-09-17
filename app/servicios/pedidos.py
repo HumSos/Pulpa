@@ -12,7 +12,8 @@ from app.modelos import (
     PedidoClienteLinea,
     Producto,
 )
-from app.servicios.catalogo import DatoInvalidoError, PrecioNoDefinidoError, precio_vigente
+from app.servicios.catalogo import precio_vigente
+from app.servicios.errores import DatoInvalidoError, PrecioNoDefinidoError
 
 CENTAVOS = Decimal("0.01")
 
@@ -125,8 +126,12 @@ def crear_pedido(
     direccion_texto = cliente.direccion
     if direccion_entrega_id is not None:
         direccion = db.get(DireccionEntrega, direccion_entrega_id)
-        if direccion is None or direccion.cliente_id != cliente.id:
-            raise DatoInvalidoError("La dirección de entrega no pertenece a este cliente")
+        if (
+            direccion is None
+            or direccion.cliente_id != cliente.id
+            or not direccion.activo
+        ):
+            raise DatoInvalidoError("La dirección de entrega no es válida para este cliente")
         direccion_texto = direccion.direccion
 
     pedido = PedidoCliente(

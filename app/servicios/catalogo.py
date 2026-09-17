@@ -5,14 +5,7 @@ from sqlalchemy import func, or_, select, update
 from sqlalchemy.orm import Session, joinedload
 
 from app.modelos import CostoProveedor, PrecioVenta, Producto, ProveedorProducto, Unidad
-
-
-class PrecioNoDefinidoError(Exception):
-    """No hay precio o costo vigente en la fecha pedida."""
-
-
-class DatoInvalidoError(ValueError):
-    """Datos capturados que no cumplen las reglas del catálogo."""
+from app.servicios.errores import DatoInvalidoError, PrecioNoDefinidoError
 
 
 def _validar_monto(valor, nombre: str) -> Decimal:
@@ -182,3 +175,4 @@ def marcar_preferido(db: Session, proveedor_producto_id: int) -> ProveedorProduc
     relacion.es_preferido = True
     db.flush()
     return relacion
+

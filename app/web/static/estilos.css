@@ -17,3 +17,5 @@ button, .boton { font: inherit; background: var(--acento); color: #fff; border: 
 .error { color: var(--error); background: #fcebeb; padding: .5rem .75rem; border-radius: 6px; }
 .etiqueta { font-size: .8rem; padding: .1rem .5rem; border-radius: 999px; background: var(--suave); }
 .encabezado { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+.exito { color: #085041; background: #e1f5ee; padding: .5rem .75rem; border-radius: 6px; }
+button.secundario { background: transparent; color: var(--error); border: 1px solid var(--borde); }

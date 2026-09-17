@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block titulo %}Clientes{% endblock %}
+{% block contenido %}
+<div class="encabezado">
+  <h1>Clientes</h1>
+  <a class="boton" href="/clientes/nuevo">Nuevo cliente</a>
+</div>
+
+<input type="search" name="q" value="{{ q }}" placeholder="Buscar por negocio, contacto o teléfono"
+       hx-get="/clientes" hx-trigger="input changed delay:300ms, search" hx-target="#filas">
+
+<table>
+  <thead>
+    <tr><th>Negocio</th><th>Contacto</th><th>Teléfono</th><th class="num">Crédito</th></tr>
+  </thead>
+  <tbody id="filas">{% include "clientes/_filas.html" %}</tbody>
+</table>
+{% endblock %}
