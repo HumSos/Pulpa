@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% block titulo %}Tablero{% endblock %}
+{% block contenido %}
+<div class="encabezado">
+  <h1>Tablero</h1>
+  <form class="en-linea" method="get" action="/">
+    <label>Desde <input type="date" name="desde" value="{{ periodo.desde.isoformat() }}"></label>
+    <label>Hasta <input type="date" name="hasta" value="{{ periodo.hasta.isoformat() }}"></label>
+    <button type="submit">Ver</button>
+  </form>
+</div>
+
+<div class="tarjetas">
+  <div class="tarjeta">
+    <h3>Ventas del periodo</h3>
+    <div class="valor">{{ ventas | dinero }}</div>
+    {% if variacion_pct is not none %}
+      <small class="{{ 'sube' if variacion_pct >= 0 else 'baja' }}">
+        {{ "%+.1f"|format(variacion_pct) }}% vs periodo anterior
+      </small>
+    {% else %}
+      <small>Sin periodo anterior para comparar</small>
+    {% endif %}
+  </div>
+  <div class="tarjeta">
+    <h3>Compras del periodo</h3>
+    <div class="valor">{{ compras | dinero }}</div>
+  </div>
+  <div class="tarjeta">
+    <h3>Diferencia</h3>
+    <div class="valor {{ 'sube' if margen >= 0 else 'baja' }}">{{ margen | dinero }}</div>
+    <small>{{ "%.1f"|format(margen_pct) }}% sobre ventas</small>
+  </div>
+  <div class="tarjeta">
+    <h3>Pedidos</h3>
+    <div class="valor">{{ pedidos }}</div>
+    <small>{{ clientes }} clientes · ticket {{ ticket_promedio | dinero }}</small>
+  </div>
+  <div class="tarjeta">
+    <h3>Cobrado en el periodo</h3>
+    <div class="valor">{{ cobrado | dinero }}</div>
+    <small>Pagado a proveedores {{ pagado | dinero }}</small>
+  </div>
+  <div class="tarjeta">
+    <h3>Por cobrar (total)</h3>
+    <div class="valor">{{ por_cobrar | dinero }}</div>
+    <small class="{{ 'baja' if vencido > 0 }}">{{ vencido | dinero }} vencido</small>
+  </div>
+  <div class="tarjeta">
+    <h3>Por pagar (total)</h3>
+    <div class="valor">{{ por_pagar | dinero }}</div>
+  </div>
+  <div class="tarjeta">
+    <h3>Descuentos otorgados</h3>
+    <div class="valor">{{ descuentos | dinero }}</div>
+    <small>Vendido debajo de lista</small>
+  </div>
+</div>
+
+<p class="nota">
+  La diferencia entre ventas y compras es un indicador de flujo del periodo, no la utilidad
+  contable: lo comprado en un periodo puede venderse en otro.
+</p>
+
+{% if ventas_por_dia %}
+<h2>Ventas por día</h2>
+<div class="barras">
+  {% for dia, total in ventas_por_dia %}
+  <div style="height: {{ (total / maximo_dia * 100) | round | int }}%"
+       title="{{ dia.strftime('%d/%m/%Y') }}: {{ total | dinero }}"></div>
+  {% endfor %}
+</div>
+<p class="nota">Del {{ periodo.desde.strftime("%d/%m/%Y") }} al {{ periodo.hasta.strftime("%d/%m/%Y") }}</p>
+{% endif %}
+
+<div class="columnas">
+  <div>
+    <h2>Productos que más venden</h2>
+    <table>
+      <thead><tr><th>Producto</th><th class="num">Vendido</th></tr></thead>
+      <tbody>
+      {% for nombre, total in top_productos %}
+        <tr><td>{{ nombre }}</td><td class="num">{{ total | dinero }}</td></tr>
+      {% else %}
+        <tr><td colspan="2">Sin ventas en el periodo.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div>
+    <h2>Clientes que más compran</h2>
+    <table>
+      <thead><tr><th>Cliente</th><th class="num">Comprado</th></tr></thead>
+      <tbody>
+      {% for nombre, total in top_clientes %}
+        <tr><td>{{ nombre }}</td><td class="num">{{ total | dinero }}</td></tr>
+      {% else %}
+        <tr><td colspan="2">Sin ventas en el periodo.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
