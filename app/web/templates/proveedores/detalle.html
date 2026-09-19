@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block titulo %}{{ proveedor.nombre }}{% endblock %}
+{% block contenido %}
+<p><a href="/proveedores">Volver a proveedores</a></p>
+<section id="datos">{% include "proveedores/_datos.html" %}</section>
+<section id="suministros">{% include "proveedores/_suministros.html" %}</section>
+{% endblock %}

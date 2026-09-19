@@ -1,0 +1,8 @@
+<label>Nombre <input name="nombre" required maxlength="150" value="{{ datos.nombre or '' }}"></label>
+<label>Contacto <input name="contacto" maxlength="150" value="{{ datos.contacto or '' }}"></label>
+<label>Teléfono <input name="telefono" type="tel" maxlength="30" value="{{ datos.telefono or '' }}"></label>
+<label>Correo <input name="email" type="email" maxlength="150" value="{{ datos.email or '' }}"></label>
+<label>Días de crédito (0 = contado)
+  <input name="dias_credito" type="number" min="0" max="180" step="1"
+         value="{{ datos.dias_credito | default(0) }}">
+</label>

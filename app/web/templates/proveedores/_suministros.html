@@ -1,0 +1,68 @@
+<h2>Productos que surte</h2>
+{% if error %}<p class="error">{{ error }}</p>{% endif %}
+
+<table>
+  <thead>
+    <tr>
+      <th>Producto</th><th>Presentación</th><th class="num">Costo</th>
+      <th>Nuevo costo</th><th></th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for s in suministros %}
+    <tr>
+      <td>
+        {{ s.producto.codigo }} · {{ s.producto.descripcion }}
+        {% if s.es_preferido %}<span class="etiqueta">Preferido</span>{% endif %}
+      </td>
+      <td>
+        1 {{ s.unidad_compra.clave }} = {{ s.factor_conversion.normalize() }} {{ s.producto.unidad.clave }}
+      </td>
+      <td class="num">{{ costos[s.id] | dinero if s.id in costos else "Sin costo" }}</td>
+      <td>
+        <form class="en-linea" hx-target="#suministros"
+              hx-post="/proveedores/{{ proveedor.id }}/suministros/{{ s.id }}/costo">
+          <input name="costo" inputmode="decimal" size="8" required
+                 placeholder="por {{ s.unidad_compra.clave }}">
+          <button type="submit">Actualizar</button>
+        </form>
+      </td>
+      <td>
+        {% if not s.es_preferido %}
+        <button hx-target="#suministros"
+                hx-post="/proveedores/{{ proveedor.id }}/suministros/{{ s.id }}/preferido">
+          Preferir
+        </button>
+        {% endif %}
+        <button class="secundario" hx-target="#suministros"
+                hx-confirm="¿Quitar {{ s.producto.codigo }} de este proveedor?"
+                hx-post="/proveedores/{{ proveedor.id }}/suministros/{{ s.id }}/quitar">Quitar</button>
+      </td>
+    </tr>
+  {% else %}
+    <tr><td colspan="5">Este proveedor aún no tiene productos asignados.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+<h3>Agregar producto</h3>
+<form class="en-linea" hx-post="/proveedores/{{ proveedor.id }}/suministros" hx-target="#suministros"
+      hx-on::after-request="if(event.detail.successful) this.reset()">
+  <label>Producto
+    <select name="producto_id" required>
+      <option value="">Selecciona...</option>
+      {% for p in productos %}
+      <option value="{{ p.id }}">{{ p.codigo }} · {{ p.descripcion }} (se vende por {{ p.unidad.clave }})</option>
+      {% endfor %}
+    </select>
+  </label>
+  <label>Se compra por
+    <select name="unidad_compra_id" required>
+      {% for u in unidades %}<option value="{{ u.id }}">{{ u.nombre }}</option>{% endfor %}
+    </select>
+  </label>
+  <label>Equivale a <input name="factor_conversion" inputmode="decimal" required size="6" placeholder="25"></label>
+  <label>Costo por unidad de compra <input name="costo" inputmode="decimal" size="10"></label>
+  <button type="submit">Agregar</button>
+</form>
+<p>El factor es cuántas unidades de venta trae una unidad de compra. Un bulto de 25 kg es 25.</p>

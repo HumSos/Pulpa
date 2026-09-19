@@ -1,0 +1,8 @@
+<h1>{{ proveedor.nombre }}</h1>
+{% if mensaje %}<p class="exito">{{ mensaje }}</p>{% endif %}
+{% if error %}<p class="error">{{ error }}</p>{% endif %}
+
+<form class="campos" hx-post="/proveedores/{{ proveedor.id }}" hx-target="#datos">
+  {% include "proveedores/_campos.html" %}
+  <button type="submit">Guardar cambios</button>
+</form>

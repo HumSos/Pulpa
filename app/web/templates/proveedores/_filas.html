@@ -1,0 +1,10 @@
+{% for p in proveedores %}
+<tr>
+  <td><a href="/proveedores/{{ p.id }}">{{ p.nombre }}</a></td>
+  <td>{{ p.contacto or "" }}</td>
+  <td>{{ p.telefono or "" }}</td>
+  <td class="num">{{ "Contado" if p.dias_credito == 0 else p.dias_credito ~ " días" }}</td>
+</tr>
+{% else %}
+<tr><td colspan="4">No hay proveedores{% if q %} que coincidan con "{{ q }}"{% endif %}.</td></tr>
+{% endfor %}
