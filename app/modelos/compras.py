@@ -1,6 +1,7 @@
 from datetime import date, datetime, timedelta
 from decimal import Decimal
 from enum import StrEnum
+from typing import TYPE_CHECKING
 
 from sqlalchemy import CheckConstraint, Enum, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -9,6 +10,9 @@ from app.db import Base, ConTiempos
 from app.modelos.catalogo import Producto
 from app.modelos.proveedores import Proveedor
 from app.tipos import DecimalFijo
+
+if TYPE_CHECKING:
+    from app.modelos.pagos import PagoProveedor
 
 
 class EstadoCompra(StrEnum):
@@ -43,6 +47,17 @@ class OrdenCompra(ConTiempos, Base):
     lineas: Mapped[list["OrdenCompraLinea"]] = relationship(
         back_populates="orden", cascade="all, delete-orphan", order_by="OrdenCompraLinea.id"
     )
+    pagos: Mapped[list["PagoProveedor"]] = relationship(
+        back_populates="orden", cascade="all, delete-orphan", order_by="PagoProveedor.fecha"
+    )
+
+    @property
+    def pagado(self) -> Decimal:
+        return sum((pago.monto for pago in self.pagos), Decimal("0.00"))
+
+    @property
+    def saldo(self) -> Decimal:
+        return self.total - self.pagado
 
     @property
     def folio(self) -> str:
