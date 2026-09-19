@@ -1,0 +1,98 @@
+<div class="encabezado">
+  <h1>{{ orden.folio }} · {{ orden.proveedor.nombre }}</h1>
+  <span class="etiqueta">{{ orden.estado.value | capitalize }}</span>
+</div>
+
+<p>
+  Orden del {{ orden.fecha.strftime("%d/%m/%Y") }}
+  {% if orden.numero_remision %} · Remisión {{ orden.numero_remision }}{% endif %}
+  {% if orden.fecha_recepcion %} · Recibida el {{ orden.fecha_recepcion.strftime("%d/%m/%Y") }}{% endif %}
+  · {{ "Contado" if orden.dias_credito == 0 else orden.dias_credito ~ " días de crédito" }}
+  {% if orden.fecha_recepcion %} · Vence {{ orden.fecha_vencimiento.strftime("%d/%m/%Y") }}{% endif %}
+</p>
+{% if orden.notas %}<p>{{ orden.notas }}</p>{% endif %}
+{% if error %}<p class="error">{{ error }}</p>{% endif %}
+
+<table>
+  <thead>
+    <tr>
+      <th>Producto</th><th class="num">Cantidad</th><th class="num">Costo</th>
+      <th class="num">Importe</th><th></th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for l in orden.lineas %}
+    <tr>
+      <td>{{ l.descripcion }}</td>
+      <td class="num">{{ l.cantidad.normalize() }} {{ l.unidad_clave }}</td>
+      <td class="num">{{ l.costo_unitario | dinero }}</td>
+      <td class="num">{{ l.importe | dinero }}</td>
+      <td>
+        {% if editable %}
+        <button class="secundario" hx-target="#orden"
+                hx-post="/compras/{{ orden.id }}/lineas/{{ l.id }}/quitar">Quitar</button>
+        {% endif %}
+      </td>
+    </tr>
+  {% else %}
+    <tr><td colspan="5">Todavía no hay productos en esta orden.</td></tr>
+  {% endfor %}
+  </tbody>
+  <tfoot>
+    <tr><th colspan="3" class="num">Total</th><th class="num">{{ orden.total | dinero }}</th><th></th></tr>
+  </tfoot>
+</table>
+
+{% if editable %}
+<form class="en-linea" hx-post="/compras/{{ orden.id }}/lineas" hx-target="#orden"
+      hx-on::after-request="if(event.detail.successful) this.reset()">
+  <label>Producto
+    <select name="producto_id" required
+            hx-on:change="const o = this.selectedOptions[0];
+                          this.form.costo_unitario.value = o.dataset.costo || ''">
+      <option value="">Selecciona...</option>
+      {% for s in suministros %}
+      <option value="{{ s.producto_id }}" data-costo="{{ costos[s.producto_id] | default('', true) }}">
+        {{ s.producto.codigo }} · {{ s.producto.descripcion }} (por {{ s.unidad_compra.clave }})
+      </option>
+      {% endfor %}
+    </select>
+  </label>
+  <label>Cantidad <input name="cantidad" inputmode="decimal" required size="8"></label>
+  <label>Costo unitario <input name="costo_unitario" inputmode="decimal" size="10"></label>
+  <button type="submit">Agregar</button>
+</form>
+{% if not suministros %}
+  <p class="error">Este proveedor no tiene productos asignados.
+    <a href="/proveedores/{{ orden.proveedor_id }}">Agrégaselos en su ficha</a>.</p>
+{% endif %}
+{% endif %}
+
+{% if orden.estado.value == "enviada" %}
+<h3>Recibir mercancía</h3>
+<form class="en-linea" hx-post="/compras/{{ orden.id }}/recibir" hx-target="#orden">
+  <label>Número de remisión
+    <input name="numero_remision" maxlength="50" value="{{ orden.numero_remision or '' }}" required>
+  </label>
+  <label>Fecha de recepción
+    <input type="date" name="fecha_recepcion" value="{{ hoy }}">
+  </label>
+  <button type="submit">Marcar como recibida</button>
+</form>
+{% endif %}
+
+<div class="en-linea">
+  {% if editable %}
+  <form hx-post="/compras/{{ orden.id }}/estado" hx-target="#orden">
+    <input type="hidden" name="estado" value="enviada">
+    <button type="submit">Marcar como enviada</button>
+  </form>
+  {% endif %}
+  {% if orden.estado.value in ("borrador", "enviada") %}
+  <form hx-post="/compras/{{ orden.id }}/estado" hx-target="#orden">
+    <input type="hidden" name="estado" value="cancelada">
+    <button class="secundario" type="submit"
+            hx-confirm="¿Cancelar la orden {{ orden.folio }}?">Cancelar orden</button>
+  </form>
+  {% endif %}
+</div>

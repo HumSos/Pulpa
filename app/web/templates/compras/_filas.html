@@ -1,0 +1,12 @@
+{% for o in ordenes %}
+<tr>
+  <td><a href="/compras/{{ o.id }}">{{ o.folio }}</a></td>
+  <td>{{ o.proveedor.nombre }}</td>
+  <td>{{ o.numero_remision or "" }}</td>
+  <td>{{ o.fecha.strftime("%d/%m/%Y") }}</td>
+  <td><span class="etiqueta">{{ o.estado.value | capitalize }}</span></td>
+  <td class="num">{{ o.total | dinero }}</td>
+</tr>
+{% else %}
+<tr><td colspan="6">No hay órdenes que coincidan.</td></tr>
+{% endfor %}

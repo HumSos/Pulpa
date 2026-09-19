@@ -5,7 +5,7 @@ from fastapi.staticfiles import StaticFiles
 from sqlalchemy import text
 
 from app.config import settings
-from app.web import clientes, pedidos, productos, proveedores
+from app.web import clientes, compras, pedidos, productos, proveedores
 from app.web.deps import DbSession
 from app.web.plantillas import templates
 
@@ -15,6 +15,7 @@ app.include_router(productos.router)
 app.include_router(clientes.router)
 app.include_router(pedidos.router)
 app.include_router(proveedores.router)
+app.include_router(compras.router)
 
 
 

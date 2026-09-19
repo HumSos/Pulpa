@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block titulo %}Nueva orden de compra{% endblock %}
+{% block contenido %}
+<p><a href="/compras">Volver a compras</a></p>
+<h1>Nueva orden de compra</h1>
+
+{% if not proveedores %}
+  <p class="error">No hay proveedores registrados.
+    <a href="/proveedores/nuevo">Da de alta uno primero</a>.</p>
+{% endif %}
+{% if error %}<p class="error">{{ error }}</p>{% endif %}
+
+<form class="campos" method="post" action="/compras/nueva">
+  <label>Proveedor
+    <select name="proveedor_id" required>
+      <option value="">Selecciona...</option>
+      {% for p in proveedores %}
+      <option value="{{ p.id }}">{{ p.nombre }}</option>
+      {% endfor %}
+    </select>
+  </label>
+  <label>Número de remisión (opcional por ahora)
+    <input name="numero_remision" maxlength="50" value="{{ datos.numero_remision or '' }}">
+  </label>
+  <label>Notas <input name="notas" maxlength="500"></label>
+  <button type="submit">Crear orden</button>
+</form>
+{% endblock %}

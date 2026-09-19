@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block titulo %}Compras{% endblock %}
+{% block contenido %}
+<div class="encabezado">
+  <h1>Órdenes de compra</h1>
+  <a class="boton" href="/compras/nueva">Nueva orden</a>
+</div>
+
+<div class="en-linea">
+  <input type="search" name="q" value="{{ q }}" placeholder="Buscar por proveedor o remisión"
+         hx-get="/compras" hx-trigger="input changed delay:300ms, search"
+         hx-include="[name='estado']" hx-target="#filas">
+  <select name="estado" hx-get="/compras" hx-include="[name='q']" hx-target="#filas">
+    <option value="">Todos los estados</option>
+    {% for e in estados %}
+    <option value="{{ e.value }}" {% if estado == e.value %}selected{% endif %}>
+      {{ e.value | capitalize }}
+    </option>
+    {% endfor %}
+  </select>
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <th>Folio</th><th>Proveedor</th><th>Remisión</th><th>Fecha</th>
+      <th>Estado</th><th class="num">Total</th>
+    </tr>
+  </thead>
+  <tbody id="filas">{% include "compras/_filas.html" %}</tbody>
+</table>
+{% endblock %}
