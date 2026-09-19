@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from decimal import Decimal
 from enum import StrEnum
 
@@ -18,12 +18,6 @@ class EstadoCompra(StrEnum):
     CANCELADA = "cancelada"
 
 
-def _enum(tipo):
-    return Enum(
-        tipo, native_enum=False, length=20, values_callable=lambda e: [m.value for m in e]
-    )
-
-
 class OrdenCompra(ConTiempos, Base):
     __tablename__ = "ordenes_compra"
 
@@ -34,7 +28,14 @@ class OrdenCompra(ConTiempos, Base):
     fecha_recepcion: Mapped[date | None]
     dias_credito: Mapped[int] = mapped_column(default=0)
     estado: Mapped[EstadoCompra] = mapped_column(
-        _enum(EstadoCompra), default=EstadoCompra.BORRADOR, index=True
+        Enum(
+            EstadoCompra,
+            native_enum=False,
+            length=20,
+            values_callable=lambda enum: [m.value for m in enum],
+        ),
+        default=EstadoCompra.BORRADOR,
+        index=True,
     )
     notas: Mapped[str | None] = mapped_column(String(500))
 
@@ -54,7 +55,7 @@ class OrdenCompra(ConTiempos, Base):
     @property
     def fecha_vencimiento(self) -> date:
         base = self.fecha_recepcion or self.fecha.date()
-        return base + __import__("datetime").timedelta(days=self.dias_credito)
+        return base + timedelta(days=self.dias_credito)
 
 
 class OrdenCompraLinea(ConTiempos, Base):
