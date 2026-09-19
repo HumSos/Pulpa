@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block titulo %}Pedidos{% endblock %}
+{% block contenido %}
+<div class="encabezado">
+  <h1>Pedidos</h1>
+  <a class="boton" href="/pedidos/nuevo">Nuevo pedido</a>
+</div>
+
+<div class="en-linea">
+  <input type="search" name="q" value="{{ q }}" placeholder="Buscar por cliente"
+         hx-get="/pedidos" hx-trigger="input changed delay:300ms, search"
+         hx-include="[name='estado']" hx-target="#filas">
+  <select name="estado" hx-get="/pedidos" hx-include="[name='q']" hx-target="#filas">
+    <option value="">Todos los estados</option>
+    {% for e in estados %}
+    <option value="{{ e.value }}" {% if estado == e.value %}selected{% endif %}>
+      {{ e.value | capitalize }}
+    </option>
+    {% endfor %}
+  </select>
+</div>
+
+<table>
+  <thead>
+    <tr><th>Folio</th><th>Cliente</th><th>Fecha</th><th>Estado</th><th class="num">Total</th></tr>
+  </thead>
+  <tbody id="filas">{% include "pedidos/_filas.html" %}</tbody>
+</table>
+{% endblock %}

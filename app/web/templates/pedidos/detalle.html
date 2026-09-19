@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% block titulo %}{{ pedido.folio }}{% endblock %}
+{% block contenido %}
+<p><a href="/pedidos">Volver a pedidos</a></p>
+<section id="pedido">{% include "pedidos/_detalle.html" %}</section>
+{% endblock %}

@@ -1,0 +1,11 @@
+{% for p in pedidos %}
+<tr>
+  <td><a href="/pedidos/{{ p.id }}">{{ p.folio }}</a></td>
+  <td>{{ p.cliente.nombre_negocio }}</td>
+  <td>{{ p.fecha_pedido.strftime("%d/%m/%Y") }}</td>
+  <td><span class="etiqueta">{{ p.estado.value | capitalize }}</span></td>
+  <td class="num">{{ p.total | dinero }}</td>
+</tr>
+{% else %}
+<tr><td colspan="5">No hay pedidos que coincidan.</td></tr>
+{% endfor %}

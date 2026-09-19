@@ -1,0 +1,10 @@
+{% if direcciones %}
+<label>Dirección de entrega
+  <select name="direccion_entrega_id">
+    <option value="">Dirección principal del cliente</option>
+    {% for d in direcciones %}
+    <option value="{{ d.id }}">{{ d.alias }} · {{ d.direccion }}</option>
+    {% endfor %}
+  </select>
+</label>
+{% endif %}

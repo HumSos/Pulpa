@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block titulo %}Nuevo pedido{% endblock %}
+{% block contenido %}
+<p><a href="/pedidos">Volver a pedidos</a></p>
+<h1>Nuevo pedido</h1>
+
+{% if not clientes %}
+  <p class="error">No hay clientes registrados. <a href="/clientes/nuevo">Da de alta uno primero</a>.</p>
+{% endif %}
+{% if error %}<p class="error">{{ error }}</p>{% endif %}
+
+<form class="campos" method="post" action="/pedidos/nuevo">
+  <label>Cliente
+    <select name="cliente_id" required
+            hx-get="/pedidos/nuevo" hx-target="#direcciones" hx-trigger="change">
+      <option value="">Selecciona...</option>
+      {% for c in clientes %}
+      <option value="{{ c.id }}" {% if datos.cliente_id == c.id %}selected{% endif %}>
+        {{ c.nombre_negocio }}
+      </option>
+      {% endfor %}
+    </select>
+  </label>
+
+  <span id="direcciones">{% include "pedidos/_direcciones.html" %}</span>
+
+  <label>Fecha de entrega
+    <input type="date" name="fecha_entrega" min="{{ hoy }}" value="{{ datos.fecha_entrega }}">
+  </label>
+  <label>Referencia del cliente (opcional)
+    <input name="referencia_cliente" maxlength="50" placeholder="Su número de orden">
+  </label>
+  <label>Notas
+    <input name="notas" maxlength="500">
+  </label>
+  <button type="submit">Crear pedido</button>
+</form>
+{% endblock %}
