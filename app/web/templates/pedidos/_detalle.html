@@ -66,6 +66,51 @@
 </form>
 {% endif %}
 
+{% if cobrable %}
+<h3>Cobros</h3>
+<p>
+  Cobrado {{ pedido.cobrado | dinero }} ·
+  <strong>Saldo {{ pedido.saldo | dinero }}</strong> ·
+  Vence {{ pedido.fecha_vencimiento.strftime("%d/%m/%Y") }}
+</p>
+
+<table>
+  <thead><tr><th>Fecha</th><th>Método</th><th>Referencia</th><th class="num">Monto</th><th></th></tr></thead>
+  <tbody>
+  {% for c in pedido.cobros %}
+    <tr>
+      <td>{{ c.fecha.strftime("%d/%m/%Y") }}</td>
+      <td>{{ c.metodo.value | capitalize }}</td>
+      <td>{{ c.referencia or "" }}</td>
+      <td class="num">{{ c.monto | dinero }}</td>
+      <td>
+        <button class="secundario" hx-target="#pedido"
+                hx-confirm="¿Eliminar este cobro de {{ c.monto | dinero }}?"
+                hx-post="/pedidos/{{ pedido.id }}/cobros/{{ c.id }}/eliminar">Eliminar</button>
+      </td>
+    </tr>
+  {% else %}
+    <tr><td colspan="5">Sin cobros registrados.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+{% if pedido.saldo > 0 %}
+<form class="en-linea" hx-post="/pedidos/{{ pedido.id }}/cobros" hx-target="#pedido"
+      hx-on::after-request="if(event.detail.successful) this.reset()">
+  <label>Monto <input name="monto" inputmode="decimal" required size="10"></label>
+  <label>Fecha <input type="date" name="fecha" value="{{ hoy }}"></label>
+  <label>Método
+    <select name="metodo">
+      {% for m in metodos %}<option value="{{ m.value }}">{{ m.value | capitalize }}</option>{% endfor %}
+    </select>
+  </label>
+  <label>Referencia <input name="referencia" maxlength="80" size="12"></label>
+  <button type="submit">Registrar cobro</button>
+</form>
+{% endif %}
+{% endif %}
+
 <div class="en-linea">
   {% if editable %}
   <form hx-post="/pedidos/{{ pedido.id }}/estado" hx-target="#pedido">

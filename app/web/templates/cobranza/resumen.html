@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block titulo %}Cobranza{% endblock %}
+{% block contenido %}
+<h1>Cuentas pendientes</h1>
+
+<h2>Por cobrar · {{ total_por_cobrar | dinero }}</h2>
+<table>
+  <thead>
+    <tr><th>Tramo</th><th class="num">Monto</th></tr>
+  </thead>
+  <tbody>
+  {% for tramo, monto in tramos.items() %}
+    <tr><td>{{ tramo }}{% if tramo != "Por vencer" %} días vencido{% endif %}</td>
+        <td class="num">{{ monto | dinero }}</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+<table>
+  <thead>
+    <tr>
+      <th>Pedido</th><th>Cliente</th><th>Vence</th>
+      <th class="num">Total</th><th class="num">Cobrado</th><th class="num">Saldo</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for p in por_cobrar %}
+    <tr>
+      <td><a href="/pedidos/{{ p.id }}">{{ p.folio }}</a></td>
+      <td>{{ p.cliente.nombre_negocio }}</td>
+      <td>
+        {{ p.fecha_vencimiento.strftime("%d/%m/%Y") }}
+        {% if p.fecha_vencimiento < hoy %}<span class="etiqueta">Vencido</span>{% endif %}
+      </td>
+      <td class="num">{{ p.total | dinero }}</td>
+      <td class="num">{{ p.cobrado | dinero }}</td>
+      <td class="num">{{ p.saldo | dinero }}</td>
+    </tr>
+  {% else %}
+    <tr><td colspan="6">No hay saldos pendientes de cobro.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+<h2>Por pagar · {{ total_por_pagar | dinero }}</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Orden</th><th>Proveedor</th><th>Vence</th>
+      <th class="num">Total</th><th class="num">Pagado</th><th class="num">Saldo</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for o in por_pagar %}
+    <tr>
+      <td><a href="/compras/{{ o.id }}">{{ o.folio }}</a></td>
+      <td>{{ o.proveedor.nombre }}</td>
+      <td>
+        {{ o.fecha_vencimiento.strftime("%d/%m/%Y") }}
+        {% if o.fecha_vencimiento < hoy %}<span class="etiqueta">Vencido</span>{% endif %}
+      </td>
+      <td class="num">{{ o.total | dinero }}</td>
+      <td class="num">{{ o.pagado | dinero }}</td>
+      <td class="num">{{ o.saldo | dinero }}</td>
+    </tr>
+  {% else %}
+    <tr><td colspan="6">No hay saldos pendientes de pago.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

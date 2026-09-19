@@ -81,6 +81,55 @@
 </form>
 {% endif %}
 
+{% if pagable %}
+<h3>Pagos al proveedor</h3>
+<p>
+  Pagado {{ orden.pagado | dinero }} ·
+  <strong>Saldo {{ orden.saldo | dinero }}</strong>
+  {% if orden.fecha_recepcion %} · Vence {{ orden.fecha_vencimiento.strftime("%d/%m/%Y") }}{% endif %}
+</p>
+
+<table>
+  <thead><tr><th>Fecha</th><th>Método</th><th>Referencia</th><th class="num">Monto</th><th></th></tr></thead>
+  <tbody>
+  {% for p in orden.pagos %}
+    <tr>
+      <td>{{ p.fecha.strftime("%d/%m/%Y") }}</td>
+      <td>{{ p.metodo.value | capitalize }}</td>
+      <td>{{ p.referencia or "" }}</td>
+      <td class="num">{{ p.monto | dinero }}</td>
+      <td>
+        <button class="secundario" hx-target="#orden"
+                hx-confirm="¿Eliminar este pago de {{ p.monto | dinero }}?"
+                hx-post="/compras/{{ orden.id }}/pagos/{{ p.id }}/eliminar">Eliminar</button>
+      </td>
+    </tr>
+  {% else %}
+    <tr><td colspan="5">Sin pagos registrados.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+{% if orden.saldo > 0 %}
+<form class="en-linea" hx-post="/compras/{{ orden.id }}/pagos" hx-target="#orden"
+      hx-on::after-request="if(event.detail.successful) this.reset()">
+  <label>Monto <input name="monto" inputmode="decimal" required size="10"></label>
+  <label>Fecha <input type="date" name="fecha" value="{{ hoy }}"></label>
+  <label>Método
+    <select name="metodo">
+      {% for m in metodos %}
+      <option value="{{ m.value }}" {% if m.value == "transferencia" %}selected{% endif %}>
+        {{ m.value | capitalize }}
+      </option>
+      {% endfor %}
+    </select>
+  </label>
+  <label>Referencia <input name="referencia" maxlength="80" size="12"></label>
+  <button type="submit">Registrar pago</button>
+</form>
+{% endif %}
+{% endif %}
+
 <div class="en-linea">
   {% if editable %}
   <form hx-post="/compras/{{ orden.id }}/estado" hx-target="#orden">

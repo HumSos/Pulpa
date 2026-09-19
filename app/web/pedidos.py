@@ -5,10 +5,19 @@ from fastapi import APIRouter, Form, HTTPException, Request
 from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
 
-from app.modelos import EstadoPedido, PedidoCliente
-from app.servicios import catalogo
-from app.servicios import clientes as servicio_clientes
-from app.servicios import pedidos as servicio
+from app.modelos import EstadoPedido, MetodoPago, PedidoCliente
+from app.servicios import (
+    catalogo,
+)
+from app.servicios import (
+    clientes as servicio_clientes,
+)
+from app.servicios import (
+    pagos as servicio_pagos,
+)
+from app.servicios import (
+    pedidos as servicio,
+)
 from app.servicios.errores import DatoInvalidoError
 from app.web.deps import DbSession
 from app.web.formularios import leer_decimal, leer_entero
@@ -35,6 +44,9 @@ def _contexto(db: Session, pedido: PedidoCliente, error: str | None = None) -> d
         )
         if editable
         else {},
+        "cobrable": pedido.estado in (EstadoPedido.CONFIRMADO, EstadoPedido.ENTREGADO),
+        "metodos": list(MetodoPago),
+        "hoy": date.today().isoformat(),
         "error": error,
     }
 
@@ -166,6 +178,47 @@ def cambiar_estado(
             servicio.cambiar_estado(db, pedido.id, estado)
         db.commit()
     except (DatoInvalidoError, ValueError) as error:
+        db.rollback()
+        return _fragmento(request, db, pedido, str(error))
+    return _fragmento(request, db, pedido)
+
+@router.post("/{pedido_id}/cobros")
+def registrar_cobro(
+    request: Request,
+    db: DbSession,
+    pedido_id: int,
+    monto: Annotated[str, Form()] = "",
+    fecha: Annotated[str, Form()] = "",
+    metodo: Annotated[str, Form()] = "efectivo",
+    referencia: Annotated[str, Form()] = "",
+):
+    pedido = _obtener(db, pedido_id)
+    try:
+        cantidad = leer_decimal(monto)
+        if cantidad is None:
+            raise DatoInvalidoError("Captura el monto del cobro")
+        servicio_pagos.registrar_cobro(
+            db,
+            pedido.id,
+            cantidad,
+            fecha=date.fromisoformat(fecha) if fecha else None,
+            metodo=metodo,
+            referencia=referencia,
+        )
+        db.commit()
+    except (DatoInvalidoError, ValueError) as error:
+        db.rollback()
+        return _fragmento(request, db, pedido, str(error))
+    return _fragmento(request, db, pedido)
+
+
+@router.post("/{pedido_id}/cobros/{cobro_id}/eliminar")
+def eliminar_cobro(request: Request, db: DbSession, pedido_id: int, cobro_id: int):
+    pedido = _obtener(db, pedido_id)
+    try:
+        servicio_pagos.eliminar_cobro(db, pedido.id, cobro_id)
+        db.commit()
+    except DatoInvalidoError as error:
         db.rollback()
         return _fragmento(request, db, pedido, str(error))
     return _fragmento(request, db, pedido)

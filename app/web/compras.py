@@ -5,9 +5,16 @@ from fastapi import APIRouter, Form, HTTPException, Request
 from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
 
-from app.modelos import EstadoCompra, OrdenCompra
-from app.servicios import compras as servicio
-from app.servicios import proveedores as servicio_proveedores
+from app.modelos import EstadoCompra, MetodoPago, OrdenCompra
+from app.servicios import (
+    compras as servicio,
+)
+from app.servicios import (
+    pagos as servicio_pagos,
+)
+from app.servicios import (
+    proveedores as servicio_proveedores,
+)
 from app.servicios.catalogo import costo_vigente
 from app.servicios.errores import DatoInvalidoError, PrecioNoDefinidoError
 from app.web.deps import DbSession
@@ -43,6 +50,8 @@ def _contexto(db: Session, orden: OrdenCompra, error: str | None = None) -> dict
         "suministros": suministros,
         "costos": _costos(db, suministros),
         "hoy": date.today().isoformat(),
+        "pagable": orden.estado in (EstadoCompra.ENVIADA, EstadoCompra.RECIBIDA),
+        "metodos": list(MetodoPago),
         "error": error,
     }
 
@@ -177,6 +186,47 @@ def recibir(
         )
         db.commit()
     except (DatoInvalidoError, ValueError) as error:
+        db.rollback()
+        return _fragmento(request, db, orden, str(error))
+    return _fragmento(request, db, orden)
+
+@router.post("/{orden_id}/pagos")
+def registrar_pago(
+    request: Request,
+    db: DbSession,
+    orden_id: int,
+    monto: Annotated[str, Form()] = "",
+    fecha: Annotated[str, Form()] = "",
+    metodo: Annotated[str, Form()] = "transferencia",
+    referencia: Annotated[str, Form()] = "",
+):
+    orden = _obtener(db, orden_id)
+    try:
+        cantidad = leer_decimal(monto)
+        if cantidad is None:
+            raise DatoInvalidoError("Captura el monto del pago")
+        servicio_pagos.registrar_pago(
+            db,
+            orden.id,
+            cantidad,
+            fecha=date.fromisoformat(fecha) if fecha else None,
+            metodo=metodo,
+            referencia=referencia,
+        )
+        db.commit()
+    except (DatoInvalidoError, ValueError) as error:
+        db.rollback()
+        return _fragmento(request, db, orden, str(error))
+    return _fragmento(request, db, orden)
+
+
+@router.post("/{orden_id}/pagos/{pago_id}/eliminar")
+def eliminar_pago(request: Request, db: DbSession, orden_id: int, pago_id: int):
+    orden = _obtener(db, orden_id)
+    try:
+        servicio_pagos.eliminar_pago(db, orden.id, pago_id)
+        db.commit()
+    except DatoInvalidoError as error:
         db.rollback()
         return _fragmento(request, db, orden, str(error))
     return _fragmento(request, db, orden)
