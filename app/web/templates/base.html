@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="es">
+{% set ruta = request.url.path %}
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -8,15 +9,28 @@
   <script src="{{ url_for('static', path='htmx.min.js') }}"></script>
 </head>
 <body>
-  <nav>
-    <a href="/">Inicio</a>
-    <a href="/productos">Productos</a>
-    <a href="/clientes">Clientes</a>
-    <a href="/proveedores">Proveedores</a>
-    <a href="/compras">Compras</a>
-    <a href="/pedidos">Pedidos</a>
-    <a href="/cobranza">Cobranza</a>
-  </nav>
-  <main>{% block contenido %}{% endblock %}</main>
+  <aside class="barra-lateral">
+    <a class="marca" href="/">
+      <strong>Pulpa</strong>
+      <span>Sistema administrativo</span>
+    </a>
+    <nav>
+      <a href="/" class="{{ 'activo' if ruta == '/' }}">Tablero</a>
+
+      <p class="grupo">Operación</p>
+      <a href="/pedidos" class="{{ 'activo' if ruta.startswith('/pedidos') }}">Pedidos</a>
+      <a href="/compras" class="{{ 'activo' if ruta.startswith('/compras') }}">Compras</a>
+      <a href="/cobranza" class="{{ 'activo' if ruta.startswith('/cobranza') }}">Cobranza</a>
+
+      <p class="grupo">Catálogos</p>
+      <a href="/productos" class="{{ 'activo' if ruta.startswith('/productos') }}">Productos</a>
+      <a href="/clientes" class="{{ 'activo' if ruta.startswith('/clientes') }}">Clientes</a>
+      <a href="/proveedores" class="{{ 'activo' if ruta.startswith('/proveedores') }}">Proveedores</a>
+    </nav>
+  </aside>
+
+  <main>
+    <div class="contenido">{% block contenido %}{% endblock %}</div>
+  </main>
 </body>
 </html>

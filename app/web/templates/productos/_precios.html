@@ -20,8 +20,8 @@
       <td>{{ p.vigente_desde.strftime("%d/%m/%Y %H:%M") }}</td>
       <td class="num">{{ p.precio | dinero }}</td>
       <td>
-        {% if p.vigente_desde > ahora %}<span class="etiqueta">Programado</span>
-        {% elif vigente and p.id == vigente.id %}<span class="etiqueta">Vigente</span>{% endif %}
+        {% if p.vigente_desde > ahora %}<span class="etiqueta etiqueta--programado">Programado</span>
+        {% elif vigente and p.id == vigente.id %}<span class="etiqueta etiqueta--vigente">Vigente</span>{% endif %}
       </td>
     </tr>
   {% else %}

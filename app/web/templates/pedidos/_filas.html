@@ -3,7 +3,7 @@
   <td><a href="/pedidos/{{ p.id }}">{{ p.folio }}</a></td>
   <td>{{ p.cliente.nombre_negocio }}</td>
   <td>{{ p.fecha_pedido.strftime("%d/%m/%Y") }}</td>
-  <td><span class="etiqueta">{{ p.estado.value | capitalize }}</span></td>
+  <td><span class="etiqueta etiqueta--{{ p.estado.value }}">{{ p.estado.value | capitalize }}</span></td>
   <td class="num">{{ p.total | dinero }}</td>
 </tr>
 {% else %}

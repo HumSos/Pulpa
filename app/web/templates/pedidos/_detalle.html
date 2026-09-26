@@ -1,6 +1,6 @@
 <div class="encabezado">
   <h1>{{ pedido.folio }} · {{ pedido.cliente.nombre_negocio }}</h1>
-  <span class="etiqueta">{{ pedido.estado.value | capitalize }}</span>
+  <span class="etiqueta etiqueta--{{ pedido.estado.value }}">{{ pedido.estado.value | capitalize }}</span>
 </div>
 
 <p>

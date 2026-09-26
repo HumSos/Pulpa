@@ -4,7 +4,7 @@
   <td>{{ o.proveedor.nombre }}</td>
   <td>{{ o.numero_remision or "" }}</td>
   <td>{{ o.fecha.strftime("%d/%m/%Y") }}</td>
-  <td><span class="etiqueta">{{ o.estado.value | capitalize }}</span></td>
+  <td><span class="etiqueta etiqueta--{{ o.estado.value }}">{{ o.estado.value | capitalize }}</span></td>
   <td class="num">{{ o.total | dinero }}</td>
 </tr>
 {% else %}

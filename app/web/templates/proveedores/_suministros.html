@@ -13,7 +13,7 @@
     <tr>
       <td>
         {{ s.producto.codigo }} · {{ s.producto.descripcion }}
-        {% if s.es_preferido %}<span class="etiqueta">Preferido</span>{% endif %}
+        {% if s.es_preferido %}<span class="etiqueta etiqueta--preferido">Preferido</span>{% endif %}
       </td>
       <td>
         1 {{ s.unidad_compra.clave }} = {{ s.factor_conversion.normalize() }} {{ s.producto.unidad.clave }}

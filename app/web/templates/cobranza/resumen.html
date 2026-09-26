@@ -30,7 +30,7 @@
       <td>{{ p.cliente.nombre_negocio }}</td>
       <td>
         {{ p.fecha_vencimiento.strftime("%d/%m/%Y") }}
-        {% if p.fecha_vencimiento < hoy %}<span class="etiqueta">Vencido</span>{% endif %}
+        {% if p.fecha_vencimiento < hoy %}<span class="etiqueta etiqueta--vencido">Vencido</span>{% endif %}
       </td>
       <td class="num">{{ p.total | dinero }}</td>
       <td class="num">{{ p.cobrado | dinero }}</td>
@@ -57,7 +57,7 @@
       <td>{{ o.proveedor.nombre }}</td>
       <td>
         {{ o.fecha_vencimiento.strftime("%d/%m/%Y") }}
-        {% if o.fecha_vencimiento < hoy %}<span class="etiqueta">Vencido</span>{% endif %}
+        {% if o.fecha_vencimiento < hoy %}<span class="etiqueta etiqueta--vencido">Vencido</span>{% endif %}
       </td>
       <td class="num">{{ o.total | dinero }}</td>
       <td class="num">{{ o.pagado | dinero }}</td>
