@@ -1,6 +1,7 @@
 from app.modelos.catalogo import PrecioVenta, Producto, Unidad
 from app.modelos.clientes import Cliente, DireccionEntrega
 from app.modelos.compras import EstadoCompra, OrdenCompra, OrdenCompraLinea
+from app.modelos.gastos import Gasto
 from app.modelos.pagos import AplicacionPago, MetodoPago, Pago, TipoMovimiento
 from app.modelos.pedidos import EstadoPedido, PedidoCliente, PedidoClienteLinea
 from app.modelos.proveedores import CostoProveedor, Proveedor, ProveedorProducto
@@ -12,6 +13,7 @@ __all__ = [
     "DireccionEntrega",
     "EstadoCompra",
     "EstadoPedido",
+    "Gasto",
     "MetodoPago",
     "OrdenCompra",
     "OrdenCompraLinea",

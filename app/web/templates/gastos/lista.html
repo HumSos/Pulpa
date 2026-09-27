@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block titulo %}Gastos{% endblock %}
+{% block contenido %}
+<div class="encabezado">
+  <h1>Gastos</h1>
+  <form class="en-linea" method="get" action="/gastos">
+    <label>Desde <input type="date" name="desde" value="{{ desde.isoformat() }}"></label>
+    <label>Hasta <input type="date" name="hasta" value="{{ hasta.isoformat() }}"></label>
+    <button type="submit">Ver</button>
+  </form>
+</div>
+
+<section id="gastos">{% include "gastos/_contenido.html" %}</section>
+{% endblock %}

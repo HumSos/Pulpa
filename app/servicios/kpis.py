@@ -240,8 +240,11 @@ def ventas_por_vendedor(db: Session, periodo: Periodo) -> list[tuple[str, Decima
 
 
 def resumen(db: Session, periodo: Periodo) -> dict:
+    from app.servicios import gastos as servicio_gastos
+
     ventas = ventas_del_periodo(db, periodo)
     compras = compras_del_periodo(db, periodo)
+    gastos_periodo = servicio_gastos.total(db, periodo.desde, periodo.hasta)
     pedidos = numero_de_pedidos(db, periodo)
     previo = periodo.anterior()
     ventas_previas = ventas_del_periodo(db, previo)
@@ -252,6 +255,9 @@ def resumen(db: Session, periodo: Periodo) -> dict:
         "compras": compras,
         "margen": ventas - compras,
         "margen_pct": (ventas - compras) / ventas * 100 if ventas else CERO,
+        "gastos": gastos_periodo,
+        "gastos_por_categoria": servicio_gastos.por_categoria(db, periodo.desde, periodo.hasta),
+        "utilidad": ventas - compras - gastos_periodo,
         "cobrado": cobrado_del_periodo(db, periodo),
         "pagado": pagado_del_periodo(db, periodo),
         "pedidos": pedidos,

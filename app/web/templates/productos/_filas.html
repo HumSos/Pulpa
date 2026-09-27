@@ -1,10 +1,15 @@
 {% for p in productos %}
+{% set m = margenes.get(p.id) %}
 <tr>
   <td><a href="/productos/{{ p.id }}">{{ p.codigo }}</a></td>
   <td>{{ p.descripcion }}</td>
-  <td>{{ p.unidad.clave }}</td>
+  <td>{{ p.categoria or "" }}</td>
   <td class="num">{{ precios[p.id] | dinero if p.id in precios else "Sin precio" }}</td>
+  <td class="num">{{ m.costo | dinero if m else "" }}</td>
+  <td class="num {{ 'baja' if m and m.margen is not none and m.margen < 0 }}">
+    {% if m and m.pct is not none %}{{ m.margen | dinero }} · {{ m.pct }}%{% endif %}
+  </td>
 </tr>
 {% else %}
-<tr><td colspan="4">No hay productos{% if q %} que coincidan con "{{ q }}"{% endif %}.</td></tr>
+<tr><td colspan="6">No hay productos{% if q %} que coincidan con "{{ q }}"{% endif %}.</td></tr>
 {% endfor %}

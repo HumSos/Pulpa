@@ -184,3 +184,41 @@ def marcar_preferido(db: Session, proveedor_producto_id: int) -> ProveedorProduc
     db.flush()
     return relacion
 
+def margenes_vigentes(db: Session, producto_ids: list[int]) -> dict[int, dict]:
+    """Precio, costo del proveedor preferido y margen, por producto."""
+    if not producto_ids:
+        return {}
+
+    precios = precios_vigentes(db, producto_ids)
+    preferidos = db.execute(
+        select(
+            ProveedorProducto.producto_id,
+            ProveedorProducto.id,
+            ProveedorProducto.factor_conversion,
+        )
+        .where(
+            ProveedorProducto.producto_id.in_(producto_ids),
+            ProveedorProducto.es_preferido.is_(True),
+            ProveedorProducto.activo.is_(True),
+        )
+    )
+
+    resultado = {}
+    for producto_id, relacion_id, factor in preferidos:
+        try:
+            costo_compra = costo_vigente(db, relacion_id)
+        except PrecioNoDefinidoError:
+            continue
+        # el costo es por unidad de compra; lo bajamos a unidad de venta
+        costo_unitario = (costo_compra / factor).quantize(Decimal("0.0001"))
+        precio = precios.get(producto_id)
+        if precio is None or precio <= 0:
+            resultado[producto_id] = {"costo": costo_unitario, "margen": None, "pct": None}
+            continue
+        margen = precio - costo_unitario
+        resultado[producto_id] = {
+            "costo": costo_unitario,
+            "margen": margen,
+            "pct": (margen / precio * 100).quantize(Decimal("0.1")),
+        }
+    return resultado

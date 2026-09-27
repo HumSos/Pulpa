@@ -1,0 +1,70 @@
+{% if error %}<p class="error">{{ error }}</p>{% endif %}
+
+<form class="en-linea" hx-post="/gastos" hx-target="#gastos"
+      hx-on::after-request="if(event.detail.successful) this.reset()">
+  <label>Categoría
+    <input name="categoria" list="lista-gastos" required maxlength="40" size="14">
+  </label>
+  <datalist id="lista-gastos">
+    {% for c in categorias %}<option value="{{ c }}">{% endfor %}
+  </datalist>
+  <label>Concepto <input name="concepto" required maxlength="200" size="24"></label>
+  <label>Monto <input name="monto" inputmode="decimal" required size="10"></label>
+  <label>Fecha <input type="date" name="fecha" value="{{ hoy }}"></label>
+  <label>Método
+    <select name="metodo">
+      {% for m in metodos %}<option value="{{ m.value }}">{{ m.value | capitalize }}</option>{% endfor %}
+    </select>
+  </label>
+  <label>Proveedor
+    <select name="proveedor_id">
+      <option value="">Ninguno</option>
+      {% for p in proveedores %}<option value="{{ p.id }}">{{ p.nombre }}</option>{% endfor %}
+    </select>
+  </label>
+  <button type="submit">Registrar</button>
+</form>
+
+<h2>Total del periodo · {{ total | dinero }}</h2>
+<div class="columnas">
+  <div>
+    <h3>Por categoría</h3>
+    <table>
+      <tbody>
+      {% for categoria, monto in por_categoria %}
+        <tr><td>{{ categoria }}</td><td class="num">{{ monto | dinero }}</td></tr>
+      {% else %}
+        <tr><td>Sin gastos en el periodo.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <th>Fecha</th><th>Categoría</th><th>Concepto</th><th>Método</th>
+      <th>Proveedor</th><th class="num">Monto</th><th></th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for g in gastos %}
+    <tr>
+      <td>{{ g.fecha.strftime("%d/%m/%Y") }}</td>
+      <td>{{ g.categoria }}</td>
+      <td>{{ g.concepto }}{% if g.referencia %} · {{ g.referencia }}{% endif %}</td>
+      <td>{{ g.metodo.value | capitalize }}</td>
+      <td>{{ g.proveedor.nombre if g.proveedor else "" }}</td>
+      <td class="num">{{ g.monto | dinero }}</td>
+      <td>
+        <button class="secundario" hx-target="#gastos"
+                hx-confirm="¿Eliminar este gasto de {{ g.monto | dinero }}?"
+                hx-post="/gastos/{{ g.id }}/eliminar">Eliminar</button>
+      </td>
+    </tr>
+  {% else %}
+    <tr><td colspan="7">Sin gastos registrados en el periodo.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>

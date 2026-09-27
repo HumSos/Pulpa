@@ -1,7 +1,12 @@
 {% extends "base.html" %}
 {% block titulo %}{{ proveedor.nombre }}{% endblock %}
 {% block contenido %}
-<p><a href="/proveedores">Volver a proveedores</a></p>
+<div class="encabezado">
+  <a href="/proveedores">Volver a proveedores</a>
+  <a class="boton" href="/proveedores/{{ proveedor.id }}/estado-cuenta" target="_blank">
+    Estado de cuenta
+  </a>
+</div>
 <section id="datos">{% include "proveedores/_datos.html" %}</section>
 <section id="suministros">{% include "proveedores/_suministros.html" %}</section>
 {% endblock %}

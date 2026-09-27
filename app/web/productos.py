@@ -52,9 +52,11 @@ def _formulario_nuevo(request, db, error=None, datos=None, status_code=200):
 @router.get("")
 def lista(request: Request, db: DbSession, q: str = ""):
     productos = catalogo.listar_productos(db, q)
+    identificadores = [p.id for p in productos]
     contexto = {
         "productos": productos,
-        "precios": catalogo.precios_vigentes(db, [p.id for p in productos]),
+        "precios": catalogo.precios_vigentes(db, identificadores),
+        "margenes": catalogo.margenes_vigentes(db, identificadores),
         "q": q,
     }
     es_htmx = request.headers.get("HX-Request") == "true"

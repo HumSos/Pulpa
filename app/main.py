@@ -10,6 +10,7 @@ from app.web import (
     cobranza,
     compras,
     documentos,
+    gastos,
     pedidos,
     productos,
     proveedores,
@@ -25,6 +26,7 @@ app.include_router(pedidos.router)
 app.include_router(proveedores.router)
 app.include_router(compras.router)
 app.include_router(cobranza.router)
+app.include_router(gastos.router)
 app.include_router(documentos.router)
 app.include_router(tablero.router)
 

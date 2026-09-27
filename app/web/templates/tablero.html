@@ -27,9 +27,23 @@
     <div class="valor">{{ compras | dinero }}</div>
   </div>
   <div class="tarjeta">
-    <h3>Diferencia</h3>
+    <h3>Margen bruto</h3>
     <div class="valor {{ 'sube' if margen >= 0 else 'baja' }}">{{ margen | dinero }}</div>
     <small>{{ "%.1f"|format(margen_pct) }}% sobre ventas</small>
+  </div>
+  <div class="tarjeta">
+    <h3>Gastos</h3>
+    <div class="valor">{{ gastos | dinero }}</div>
+    <small>
+      {% for categoria, monto in gastos_por_categoria[:2] %}
+        {{ categoria }} {{ monto | dinero }}{% if not loop.last %} · {% endif %}
+      {% endfor %}
+    </small>
+  </div>
+  <div class="tarjeta">
+    <h3>Utilidad</h3>
+    <div class="valor {{ 'sube' if utilidad >= 0 else 'baja' }}">{{ utilidad | dinero }}</div>
+    <small>Ventas menos compras y gastos</small>
   </div>
   <div class="tarjeta">
     <h3>Pedidos</h3>
@@ -58,8 +72,8 @@
 </div>
 
 <p class="nota">
-  La diferencia entre ventas y compras es un indicador de flujo del periodo, no la utilidad
-  contable: lo comprado en un periodo puede venderse en otro.
+  El margen compara ventas contra compras del mismo periodo, así que es un indicador de flujo
+  y no la utilidad contable: lo comprado en un periodo puede venderse en otro.
 </p>
 
 {% if ventas_por_dia %}
