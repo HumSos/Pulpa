@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 from app.modelos import EstadoPedido, MetodoPago, PedidoCliente
 from app.servicios import (
     catalogo,
+    sugerencias,
 )
 from app.servicios import (
     clientes as servicio_clientes,
@@ -77,6 +78,7 @@ def nuevo(request: Request, db: DbSession, cliente_id: int | None = None):
         if cliente_id
         else [],
         "datos": {"cliente_id": cliente_id, "fecha_entrega": ""},
+        "vendedores": sugerencias.vendedores(db),
         "hoy": date.today().isoformat(),
     }
     plantilla = "pedidos/_direcciones.html" if es_htmx(request) else "pedidos/nuevo.html"
@@ -91,6 +93,7 @@ def crear(
     direccion_entrega_id: Annotated[str, Form()] = "",
     fecha_entrega: Annotated[str, Form()] = "",
     referencia_cliente: Annotated[str, Form()] = "",
+    vendedor: Annotated[str, Form()] = "",
     notas: Annotated[str, Form()] = "",
 ):
     try:
@@ -103,6 +106,7 @@ def crear(
             fecha_entrega=date.fromisoformat(fecha_entrega) if fecha_entrega else None,
             direccion_entrega_id=leer_entero(direccion_entrega_id, "La dirección"),
             referencia_cliente=referencia_cliente,
+            vendedor=vendedor,
             notas=notas,
         )
         db.commit()
@@ -112,6 +116,7 @@ def crear(
             "clientes": servicio_clientes.listar_clientes(db),
             "direcciones": [],
             "datos": {"cliente_id": cliente_id, "fecha_entrega": fecha_entrega},
+            "vendedores": sugerencias.vendedores(db),
             "hoy": date.today().isoformat(),
             "error": str(error),
         }

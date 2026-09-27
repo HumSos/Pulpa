@@ -197,6 +197,46 @@ def ventas_por_dia(db: Session, periodo: Periodo) -> list[tuple[date, Decimal]]:
     ]
 
 
+def _ventas_agrupadas(
+    db: Session, periodo: Periodo, columna, por: str = "cliente", limite: int = 8
+) -> list[tuple[str, Decimal]]:
+    etiqueta = func.coalesce(func.nullif(func.trim(columna), ""), "Sin clasificar")
+    consulta = select(etiqueta, func.sum(PedidoClienteLinea.importe)).join(
+        PedidoCliente, PedidoClienteLinea.pedido_id == PedidoCliente.id
+    )
+    if por == "cliente":
+        consulta = consulta.join(Cliente, PedidoCliente.cliente_id == Cliente.id)
+    elif por == "producto":
+        consulta = consulta.join(Producto, PedidoClienteLinea.producto_id == Producto.id)
+
+    filas = db.execute(
+        consulta.where(
+            PedidoCliente.estado.in_(VENDIDOS),
+            PedidoCliente.fecha_pedido.between(periodo.inicio, periodo.fin),
+        )
+        .group_by(etiqueta)
+        .order_by(func.sum(PedidoClienteLinea.importe).desc())
+        .limit(limite)
+    )
+    return [(str(etiqueta_valor), total) for etiqueta_valor, total in filas]
+
+
+def ventas_por_categoria(db: Session, periodo: Periodo) -> list[tuple[str, Decimal]]:
+    return _ventas_agrupadas(db, periodo, Producto.categoria, por="producto")
+
+
+def ventas_por_plaza(db: Session, periodo: Periodo) -> list[tuple[str, Decimal]]:
+    return _ventas_agrupadas(db, periodo, Cliente.plaza)
+
+
+def ventas_por_tipo_negocio(db: Session, periodo: Periodo) -> list[tuple[str, Decimal]]:
+    return _ventas_agrupadas(db, periodo, Cliente.tipo_negocio)
+
+
+def ventas_por_vendedor(db: Session, periodo: Periodo) -> list[tuple[str, Decimal]]:
+    return _ventas_agrupadas(db, periodo, PedidoCliente.vendedor, por="pedido")
+
+
 def resumen(db: Session, periodo: Periodo) -> dict:
     ventas = ventas_del_periodo(db, periodo)
     compras = compras_del_periodo(db, periodo)
@@ -223,4 +263,8 @@ def resumen(db: Session, periodo: Periodo) -> dict:
         "top_productos": top_productos(db, periodo),
         "top_clientes": top_clientes(db, periodo),
         "ventas_por_dia": ventas_por_dia(db, periodo),
+        "por_categoria": ventas_por_categoria(db, periodo),
+        "por_plaza": ventas_por_plaza(db, periodo),
+        "por_tipo_negocio": ventas_por_tipo_negocio(db, periodo),
+        "por_vendedor": ventas_por_vendedor(db, periodo),
     }

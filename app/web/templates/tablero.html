@@ -73,6 +73,29 @@
 <p class="nota">Del {{ periodo.desde.strftime("%d/%m/%Y") }} al {{ periodo.hasta.strftime("%d/%m/%Y") }}</p>
 {% endif %}
 
+<h2>Ventas por segmento</h2>
+<div class="columnas">
+  {% for titulo, filas in [
+      ("Línea de producto", por_categoria),
+      ("Plaza", por_plaza),
+      ("Tipo de negocio", por_tipo_negocio),
+      ("Vendedor", por_vendedor),
+  ] %}
+  <div>
+    <h3>{{ titulo }}</h3>
+    <table>
+      <tbody>
+      {% for nombre, total in filas %}
+        <tr><td>{{ nombre }}</td><td class="num">{{ total | dinero }}</td></tr>
+      {% else %}
+        <tr><td>Sin datos en el periodo.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endfor %}
+</div>
+
 <div class="columnas">
   <div>
     <h2>Productos que más venden</h2>

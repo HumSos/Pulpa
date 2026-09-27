@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session, joinedload
 from app.modelos import Producto, Proveedor, ProveedorProducto, Unidad
 from app.servicios.catalogo import costo_vigente, registrar_costo
 from app.servicios.errores import DatoInvalidoError, PrecioNoDefinidoError
+from app.servicios.texto import normalizar_rfc
 
 MAX_DIAS_CREDITO = 180
 
@@ -17,6 +18,8 @@ class DatosProveedor:
     contacto: str | None = None
     telefono: str | None = None
     email: str | None = None
+    rfc: str | None = None
+    direccion: str | None = None
     dias_credito: int = 0
 
 
@@ -45,6 +48,8 @@ def _normalizar(db: Session, datos: DatosProveedor, excluir_id: int | None = Non
         "contacto": _limpio(datos.contacto),
         "telefono": _limpio(datos.telefono),
         "email": email.lower() if email else None,
+        "rfc": normalizar_rfc(datos.rfc),
+        "direccion": _limpio(datos.direccion),
         "dias_credito": datos.dias_credito,
     }
 

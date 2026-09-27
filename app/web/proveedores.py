@@ -20,6 +20,8 @@ def campos_proveedor(
     contacto: Annotated[str, Form()] = "",
     telefono: Annotated[str, Form()] = "",
     email: Annotated[str, Form()] = "",
+    rfc: Annotated[str, Form()] = "",
+    direccion: Annotated[str, Form()] = "",
     dias_credito: Annotated[str, Form()] = "0",
 ) -> dict[str, str]:
     return {
@@ -27,6 +29,8 @@ def campos_proveedor(
         "contacto": contacto,
         "telefono": telefono,
         "email": email,
+        "rfc": rfc,
+        "direccion": direccion,
         "dias_credito": dias_credito,
     }
 

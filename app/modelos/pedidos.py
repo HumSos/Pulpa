@@ -45,6 +45,7 @@ class PedidoCliente(ConTiempos, Base):
         default=EstadoPedido.BORRADOR,
         index=True,
     )
+    vendedor: Mapped[str | None] = mapped_column(String(60), index=True)
     notas: Mapped[str | None] = mapped_column(String(500))
 
     cliente: Mapped[Cliente] = relationship()

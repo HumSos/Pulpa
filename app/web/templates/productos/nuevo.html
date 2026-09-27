@@ -25,6 +25,17 @@
       {% endfor %}
     </select>
   </label>
+  <label>Categoría
+    <input name="categoria" list="lista-categorias" maxlength="40"
+           placeholder="Pulpa, frijol, salsa..." value="{{ datos.categoria or '' }}">
+  </label>
+  <datalist id="lista-categorias">
+    {% for c in categorias %}<option value="{{ c }}">{% endfor %}
+  </datalist>
+  <label>Familia (opcional)
+    <input name="familia" maxlength="60" placeholder="Mango, tamarindo..."
+           value="{{ datos.familia or '' }}">
+  </label>
   <label>Precio inicial (opcional)
     <input name="precio" inputmode="decimal" value="{{ datos.precio or '' }}">
   </label>

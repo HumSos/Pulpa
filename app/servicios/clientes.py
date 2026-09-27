@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 
 from app.modelos import Cliente, DireccionEntrega
 from app.servicios.errores import DatoInvalidoError
+from app.servicios.texto import normalizar_rfc
 
 MAX_DIAS_CREDITO = 180
 
@@ -16,6 +17,9 @@ class DatosCliente:
     telefono: str | None = None
     email: str | None = None
     direccion: str | None = None
+    rfc: str | None = None
+    tipo_negocio: str | None = None
+    plaza: str | None = None
     dias_credito: int = 0
 
 
@@ -45,6 +49,9 @@ def _normalizar(db: Session, datos: DatosCliente, excluir_id: int | None = None)
         "telefono": _limpio(datos.telefono),
         "email": email.lower() if email else None,
         "direccion": _limpio(datos.direccion),
+        "rfc": normalizar_rfc(datos.rfc),
+        "tipo_negocio": _limpio(datos.tipo_negocio),
+        "plaza": _limpio(datos.plaza),
         "dias_credito": datos.dias_credito,
     }
 

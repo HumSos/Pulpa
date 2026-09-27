@@ -44,6 +44,8 @@ def crear_producto(
     descripcion: str,
     unidad_id: int,
     precio_inicial: Decimal | None = None,
+    categoria: str | None = None,
+    familia: str | None = None,
 ) -> Producto:
     codigo = codigo.strip().upper()
     descripcion = descripcion.strip()
@@ -54,7 +56,13 @@ def crear_producto(
     if db.get(Unidad, unidad_id) is None:
         raise DatoInvalidoError("La unidad seleccionada no existe")
 
-    producto = Producto(codigo=codigo, descripcion=descripcion, unidad_id=unidad_id)
+    producto = Producto(
+        codigo=codigo,
+        descripcion=descripcion,
+        unidad_id=unidad_id,
+        categoria=" ".join((categoria or "").split()) or None,
+        familia=" ".join((familia or "").split()) or None,
+    )
     db.add(producto)
     db.flush()
     if precio_inicial is not None:

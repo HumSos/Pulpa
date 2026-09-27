@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 
 from app.modelos import Cliente
 from app.servicios import clientes as servicio
+from app.servicios import sugerencias
 from app.servicios.errores import DatoInvalidoError
 from app.web.deps import DbSession
 from app.web.formularios import leer_entero
@@ -20,6 +21,9 @@ def campos_cliente(
     telefono: Annotated[str, Form()] = "",
     email: Annotated[str, Form()] = "",
     direccion: Annotated[str, Form()] = "",
+    rfc: Annotated[str, Form()] = "",
+    tipo_negocio: Annotated[str, Form()] = "",
+    plaza: Annotated[str, Form()] = "",
     dias_credito: Annotated[str, Form()] = "0",
 ) -> dict[str, str]:
     return {
@@ -28,6 +32,9 @@ def campos_cliente(
         "telefono": telefono,
         "email": email,
         "direccion": direccion,
+        "rfc": rfc,
+        "tipo_negocio": tipo_negocio,
+        "plaza": plaza,
         "dias_credito": dias_credito,
     }
 
@@ -47,8 +54,21 @@ def _obtener(db: Session, cliente_id: int) -> Cliente:
     return cliente
 
 
-def _fragmento_datos(request, cliente, datos=None, mensaje=None, error=None):
-    contexto = {"cliente": cliente, "datos": datos or cliente, "mensaje": mensaje, "error": error}
+def _listas(db: Session) -> dict:
+    return {
+        "tipos_negocio": sugerencias.tipos_de_negocio(db),
+        "plazas": sugerencias.plazas(db),
+    }
+
+
+def _fragmento_datos(request, db, cliente, datos=None, mensaje=None, error=None):
+    contexto = {
+        "cliente": cliente,
+        "datos": datos or cliente,
+        "mensaje": mensaje,
+        "error": error,
+        **_listas(db),
+    }
     return templates.TemplateResponse(request, "clientes/_datos.html", contexto)
 
 
@@ -69,8 +89,10 @@ def lista(request: Request, db: DbSession, q: str = ""):
 
 
 @router.get("/nuevo")
-def nuevo(request: Request):
-    return templates.TemplateResponse(request, "clientes/nuevo.html", {"datos": {}})
+def nuevo(request: Request, db: DbSession):
+    return templates.TemplateResponse(
+        request, "clientes/nuevo.html", {"datos": {}, **_listas(db)}
+    )
 
 
 @router.post("/nuevo")
@@ -80,7 +102,7 @@ def crear(request: Request, db: DbSession, campos: CamposCliente):
         db.commit()
     except DatoInvalidoError as error:
         db.rollback()
-        contexto = {"datos": campos, "error": str(error)}
+        contexto = {"datos": campos, "error": str(error), **_listas(db)}
         return templates.TemplateResponse(
             request, "clientes/nuevo.html", contexto, status_code=422
         )
@@ -94,6 +116,7 @@ def detalle(request: Request, db: DbSession, cliente_id: int):
         "cliente": cliente,
         "datos": cliente,
         "direcciones": servicio.direcciones_activas(db, cliente.id),
+        **_listas(db),
     }
     return templates.TemplateResponse(request, "clientes/detalle.html", contexto)
 
@@ -106,8 +129,8 @@ def guardar(request: Request, db: DbSession, cliente_id: int, campos: CamposClie
         db.commit()
     except DatoInvalidoError as error:
         db.rollback()
-        return _fragmento_datos(request, cliente, datos=campos, error=str(error))
-    return _fragmento_datos(request, cliente, mensaje="Cambios guardados")
+        return _fragmento_datos(request, db, cliente, datos=campos, error=str(error))
+    return _fragmento_datos(request, db, cliente, mensaje="Cambios guardados")
 
 
 @router.post("/{cliente_id}/direcciones")

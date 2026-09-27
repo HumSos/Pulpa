@@ -7,7 +7,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.modelos import Producto
-from app.servicios import catalogo
+from app.servicios import catalogo, sugerencias
 from app.web.deps import DbSession
 from app.web.formularios import leer_decimal, leer_fecha
 from app.web.plantillas import templates
@@ -38,7 +38,12 @@ def _contexto_precios(db: Session, producto: Producto, error: str | None = None)
 
 
 def _formulario_nuevo(request, db, error=None, datos=None, status_code=200):
-    contexto = {"unidades": catalogo.listar_unidades(db), "error": error, "datos": datos or {}}
+    contexto = {
+        "unidades": catalogo.listar_unidades(db),
+        "categorias": sugerencias.categorias(db),
+        "error": error,
+        "datos": datos or {},
+    }
     return templates.TemplateResponse(
         request, "productos/nuevo.html", contexto, status_code=status_code
     )
@@ -70,10 +75,12 @@ def crear(
     descripcion: Annotated[str, Form()],
     unidad_id: Annotated[int, Form()],
     precio: Annotated[str, Form()] = "",
+    categoria: Annotated[str, Form()] = "",
+    familia: Annotated[str, Form()] = "",
 ):
     try:
         producto = catalogo.crear_producto(
-            db, codigo, descripcion, unidad_id, leer_decimal(precio)
+            db, codigo, descripcion, unidad_id, leer_decimal(precio), categoria, familia
         )
         db.commit()
     except catalogo.DatoInvalidoError as error:
@@ -83,6 +90,8 @@ def crear(
             "descripcion": descripcion,
             "unidad_id": unidad_id,
             "precio": precio,
+            "categoria": categoria,
+            "familia": familia,
         }
         return _formulario_nuevo(request, db, str(error), datos, status_code=422)
     return RedirectResponse(f"/productos/{producto.id}", status_code=303)

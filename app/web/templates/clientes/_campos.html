@@ -13,6 +13,23 @@
 <label>Dirección principal
   <input name="direccion" maxlength="300" value="{{ datos.direccion or '' }}">
 </label>
+<label>Tipo de negocio
+  <input name="tipo_negocio" list="lista-tipos" maxlength="60"
+         placeholder="Aguas de sabor, restaurante..." value="{{ datos.tipo_negocio or '' }}">
+</label>
+<datalist id="lista-tipos">
+  {% for t in tipos_negocio %}<option value="{{ t }}">{% endfor %}
+</datalist>
+<label>Plaza o ciudad
+  <input name="plaza" list="lista-plazas" maxlength="60"
+         placeholder="Monterrey, Saltillo..." value="{{ datos.plaza or '' }}">
+</label>
+<datalist id="lista-plazas">
+  {% for p in plazas %}<option value="{{ p }}">{% endfor %}
+</datalist>
+<label>RFC
+  <input name="rfc" maxlength="13" style="text-transform: uppercase" value="{{ datos.rfc or '' }}">
+</label>
 <label>Días de crédito (0 = contado)
   <input name="dias_credito" type="number" min="0" max="180" step="1"
          value="{{ datos.dias_credito | default(0) }}">

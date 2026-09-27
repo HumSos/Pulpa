@@ -223,6 +223,7 @@ def crear_pedido_vacio(
     fecha_entrega: date | None = None,
     direccion_entrega_id: int | None = None,
     referencia_cliente: str | None = None,
+    vendedor: str | None = None,
     notas: str | None = None,
 ) -> PedidoCliente:
     cliente = db.get(Cliente, cliente_id)
@@ -249,6 +250,7 @@ def crear_pedido_vacio(
         fecha_entrega=fecha_entrega,
         dias_credito=cliente.dias_credito,
         estado=EstadoPedido.BORRADOR,
+        vendedor=" ".join((vendedor or "").split()) or None,
         notas=(notas or "").strip() or None,
     )
     db.add(pedido)

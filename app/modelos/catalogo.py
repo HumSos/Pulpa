@@ -28,6 +28,8 @@ class Producto(ConTiempos, Base):
     codigo: Mapped[str] = mapped_column(String(30), unique=True)
     descripcion: Mapped[str] = mapped_column(String(200))
     unidad_id: Mapped[int] = mapped_column(ForeignKey("unidades.id"))
+    categoria: Mapped[str | None] = mapped_column(String(40), index=True)
+    familia: Mapped[str | None] = mapped_column(String(60))
     activo: Mapped[bool] = mapped_column(default=True)
 
     unidad: Mapped[Unidad] = relationship()

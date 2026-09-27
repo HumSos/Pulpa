@@ -13,6 +13,9 @@ class Cliente(ConTiempos, Base):
     telefono: Mapped[str | None] = mapped_column(String(30))
     email: Mapped[str | None] = mapped_column(String(150))
     direccion: Mapped[str | None] = mapped_column(String(300))
+    rfc: Mapped[str | None] = mapped_column(String(13))
+    tipo_negocio: Mapped[str | None] = mapped_column(String(60), index=True)
+    plaza: Mapped[str | None] = mapped_column(String(60), index=True)
     dias_credito: Mapped[int] = mapped_column(default=0)
     activo: Mapped[bool] = mapped_column(default=True)
 

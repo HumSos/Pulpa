@@ -17,6 +17,8 @@ class Proveedor(ConTiempos, Base):
     contacto: Mapped[str | None] = mapped_column(String(150))
     telefono: Mapped[str | None] = mapped_column(String(30))
     email: Mapped[str | None] = mapped_column(String(150))
+    rfc: Mapped[str | None] = mapped_column(String(13))
+    direccion: Mapped[str | None] = mapped_column(String(300))
     dias_credito: Mapped[int] = mapped_column(default=0)
     activo: Mapped[bool] = mapped_column(default=True)
 

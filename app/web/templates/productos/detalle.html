@@ -3,7 +3,11 @@
 {% block contenido %}
 <p><a href="/productos">Volver a productos</a></p>
 <h1>{{ producto.codigo }} · {{ producto.descripcion }}</h1>
-<p>Unidad de venta: {{ producto.unidad.nombre }}</p>
+<p>
+  Unidad de venta: {{ producto.unidad.nombre }}
+  {% if producto.categoria %} · {{ producto.categoria }}{% endif %}
+  {% if producto.familia %} · {{ producto.familia }}{% endif %}
+</p>
 
 <section id="precios">{% include "productos/_precios.html" %}</section>
 {% endblock %}

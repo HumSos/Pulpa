@@ -2,6 +2,8 @@
 <label>Contacto <input name="contacto" maxlength="150" value="{{ datos.contacto or '' }}"></label>
 <label>Teléfono <input name="telefono" type="tel" maxlength="30" value="{{ datos.telefono or '' }}"></label>
 <label>Correo <input name="email" type="email" maxlength="150" value="{{ datos.email or '' }}"></label>
+<label>RFC <input name="rfc" maxlength="13" style="text-transform: uppercase" value="{{ datos.rfc or '' }}"></label>
+<label>Dirección <input name="direccion" maxlength="300" value="{{ datos.direccion or '' }}"></label>
 <label>Días de crédito (0 = contado)
   <input name="dias_credito" type="number" min="0" max="180" step="1"
          value="{{ datos.dias_credito | default(0) }}">
