@@ -1,0 +1,54 @@
+{% extends "documentos/base.html" %}
+{% set regreso = "/compras/" ~ orden.id %}
+{% block titulo %}Orden {{ orden.folio }}{% endblock %}
+{% block documento %}ORDEN DE COMPRA{% endblock %}
+{% block folio %}{{ orden.folio }}{% endblock %}
+
+{% block contenido %}
+<div class="datos">
+  <div>
+    <h2>Proveedor</h2>
+    <div><strong>{{ orden.proveedor.nombre }}</strong></div>
+    {% if orden.proveedor.contacto %}<div>{{ orden.proveedor.contacto }}</div>{% endif %}
+    {% if orden.proveedor.telefono %}<div>Tel. {{ orden.proveedor.telefono }}</div>{% endif %}
+    {% if orden.proveedor.rfc %}<div>RFC {{ orden.proveedor.rfc }}</div>{% endif %}
+  </div>
+  <div>
+    <h2>Condiciones</h2>
+    <div>Fecha: {{ orden.fecha.strftime("%d/%m/%Y") }}</div>
+    {% if orden.numero_remision %}<div>Remisión: {{ orden.numero_remision }}</div>{% endif %}
+    <div>{{ "Contado" if orden.dias_credito == 0 else orden.dias_credito ~ " días de crédito" }}</div>
+    <div>Estado: {{ orden.estado.value | capitalize }}</div>
+  </div>
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <th class="num">Cant.</th><th>UM</th><th>Descripción</th>
+      <th class="num">Costo</th><th class="num">Importe</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for l in orden.lineas %}
+    <tr>
+      <td class="num">{{ l.cantidad.normalize() }}</td>
+      <td>{{ l.unidad_clave }}</td>
+      <td>{{ l.descripcion }}</td>
+      <td class="num">{{ l.costo_unitario | dinero }}</td>
+      <td class="num">{{ l.importe | dinero }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+  <tfoot>
+    <tr><th colspan="4" class="num">Total</th><th class="num">{{ orden.total | dinero }}</th></tr>
+  </tfoot>
+</table>
+
+{% if orden.notas %}<p>{{ orden.notas }}</p>{% endif %}
+
+<div class="firmas">
+  <div class="firma">Autorizó</div>
+  <div class="firma">Recibió el proveedor</div>
+</div>
+{% endblock %}

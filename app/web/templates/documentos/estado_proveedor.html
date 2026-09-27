@@ -1,0 +1,52 @@
+{% extends "documentos/base.html" %}
+{% set regreso = "/proveedores/" ~ proveedor.id %}
+{% block titulo %}Estado de cuenta {{ proveedor.nombre }}{% endblock %}
+{% block documento %}ESTADO DE CUENTA{% endblock %}
+{% block folio %}Al {{ hoy.strftime("%d/%m/%Y") }}{% endblock %}
+
+{% block contenido %}
+<div class="datos">
+  <div>
+    <h2>Proveedor</h2>
+    <div><strong>{{ proveedor.nombre }}</strong></div>
+    {% if proveedor.contacto %}<div>{{ proveedor.contacto }}</div>{% endif %}
+    {% if proveedor.telefono %}<div>Tel. {{ proveedor.telefono }}</div>{% endif %}
+    {% if proveedor.rfc %}<div>RFC {{ proveedor.rfc }}</div>{% endif %}
+  </div>
+  <div>
+    <h2>Resumen</h2>
+    <div>Órdenes pendientes: {{ ordenes | length }}</div>
+    <div>Condiciones: {{ "Contado" if proveedor.dias_credito == 0 else proveedor.dias_credito ~ " días" }}</div>
+    <div><strong>Saldo: {{ saldo | dinero }}</strong></div>
+  </div>
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <th>Orden</th><th>Remisión</th><th>Fecha</th><th>Vence</th>
+      <th class="num">Total</th><th class="num">Pagado</th><th class="num">Saldo</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for o in ordenes %}
+    <tr>
+      <td>{{ o.folio }}</td>
+      <td>{{ o.numero_remision or "" }}</td>
+      <td>{{ o.fecha.strftime("%d/%m/%Y") }}</td>
+      <td class="{{ 'vencido' if o.fecha_vencimiento < hoy }}">
+        {{ o.fecha_vencimiento.strftime("%d/%m/%Y") }}
+      </td>
+      <td class="num">{{ o.total | dinero }}</td>
+      <td class="num">{{ o.pagado | dinero }}</td>
+      <td class="num">{{ o.saldo | dinero }}</td>
+    </tr>
+  {% else %}
+    <tr><td colspan="7">Sin saldos pendientes.</td></tr>
+  {% endfor %}
+  </tbody>
+  <tfoot>
+    <tr><th colspan="6" class="num">Total por pagar</th><th class="num">{{ saldo | dinero }}</th></tr>
+  </tfoot>
+</table>
+{% endblock %}

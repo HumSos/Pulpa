@@ -8,7 +8,11 @@
     <a class="boton" href="/cobranza/nuevo?tipo=pago">Registrar pago</a>
   </div>
 </div>
-<p><a href="/cobranza/saldos-a-favor">Ver saldos a favor de clientes</a></p>
+<p class="en-linea">
+  <a href="/cobranza/saldos-a-favor">Ver saldos a favor de clientes</a>
+  <a href="/cobranza/por-cobrar.xlsx">Descargar por cobrar (Excel)</a>
+  <a href="/cobranza/por-pagar.xlsx">Descargar por pagar (Excel)</a>
+</p>
 
 <section id="resumen">{% include "cobranza/_resumen.html" %}</section>
 {% endblock %}

@@ -1,0 +1,64 @@
+{% extends "documentos/base.html" %}
+{% set regreso = "/pedidos/" ~ pedido.id %}
+{% block titulo %}Nota {{ pedido.folio }}{% endblock %}
+{% block documento %}NOTA DE ENTREGA{% endblock %}
+{% block folio %}{{ pedido.folio }}{% endblock %}
+
+{% block contenido %}
+<div class="datos">
+  <div>
+    <h2>Cliente</h2>
+    <div><strong>{{ pedido.cliente.nombre_negocio }}</strong></div>
+    {% if pedido.cliente.nombre_contacto %}<div>{{ pedido.cliente.nombre_contacto }}</div>{% endif %}
+    {% if pedido.cliente.telefono %}<div>Tel. {{ pedido.cliente.telefono }}</div>{% endif %}
+    {% if pedido.cliente.rfc %}<div>RFC {{ pedido.cliente.rfc }}</div>{% endif %}
+  </div>
+  <div>
+    <h2>Entrega</h2>
+    <div>{{ pedido.direccion_entrega or "Dirección del cliente" }}</div>
+    {% if pedido.fecha_entrega %}<div>Fecha: {{ pedido.fecha_entrega.strftime("%d/%m/%Y") }}</div>{% endif %}
+    <div>{{ "Contado" if pedido.dias_credito == 0 else pedido.dias_credito ~ " días de crédito" }}</div>
+    {% if pedido.dias_credito %}<div>Vence: {{ pedido.fecha_vencimiento.strftime("%d/%m/%Y") }}</div>{% endif %}
+    {% if pedido.referencia_cliente %}<div>Su referencia: {{ pedido.referencia_cliente }}</div>{% endif %}
+  </div>
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <th class="num">Cant.</th><th>UM</th><th>Descripción</th>
+      <th class="num">P. unitario</th><th class="num">Importe</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for l in pedido.lineas %}
+    <tr>
+      <td class="num">{{ l.cantidad.normalize() }}</td>
+      <td>{{ l.unidad_clave }}</td>
+      <td>{{ l.descripcion }}</td>
+      <td class="num">{{ l.precio_unitario | dinero }}</td>
+      <td class="num">{{ l.importe | dinero }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+  <tfoot>
+    <tr><th colspan="4" class="num">Total</th><th class="num">{{ pedido.total | dinero }}</th></tr>
+    {% if pedido.cobrado > 0 %}
+    <tr><td colspan="4" class="num">Abonado</td><td class="num">{{ pedido.cobrado | dinero }}</td></tr>
+    <tr><th colspan="4" class="num">Saldo</th><th class="num">{{ pedido.saldo | dinero }}</th></tr>
+    {% endif %}
+  </tfoot>
+</table>
+
+{% if pedido.notas %}<p>{{ pedido.notas }}</p>{% endif %}
+
+<div class="firmas">
+  <div class="firma">Entregó{% if pedido.vendedor %} · {{ pedido.vendedor }}{% endif %}</div>
+  <div class="firma">Recibió de conformidad</div>
+</div>
+
+<p class="pie">
+  La mercancía viaja por cuenta y riesgo del comprador una vez firmada de recibido.
+  Este documento no es un comprobante fiscal.
+</p>
+{% endblock %}

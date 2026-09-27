@@ -1,6 +1,11 @@
 <div class="encabezado">
   <h1>{{ pedido.folio }} · {{ pedido.cliente.nombre_negocio }}</h1>
-  <span class="etiqueta etiqueta--{{ pedido.estado.value }}">{{ pedido.estado.value | capitalize }}</span>
+  <div class="en-linea">
+    <span class="etiqueta etiqueta--{{ pedido.estado.value }}">{{ pedido.estado.value | capitalize }}</span>
+    {% if pedido.estado.value != "borrador" %}
+    <a class="boton" href="/pedidos/{{ pedido.id }}/nota" target="_blank">Nota de entrega</a>
+    {% endif %}
+  </div>
 </div>
 
 <p>

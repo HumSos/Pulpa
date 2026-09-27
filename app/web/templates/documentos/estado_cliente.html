@@ -1,0 +1,57 @@
+{% extends "documentos/base.html" %}
+{% set regreso = "/clientes/" ~ cliente.id %}
+{% block titulo %}Estado de cuenta {{ cliente.nombre_negocio }}{% endblock %}
+{% block documento %}ESTADO DE CUENTA{% endblock %}
+{% block folio %}Al {{ hoy.strftime("%d/%m/%Y") }}{% endblock %}
+
+{% block contenido %}
+<div class="datos">
+  <div>
+    <h2>Cliente</h2>
+    <div><strong>{{ cliente.nombre_negocio }}</strong></div>
+    {% if cliente.nombre_contacto %}<div>{{ cliente.nombre_contacto }}</div>{% endif %}
+    {% if cliente.direccion %}<div>{{ cliente.direccion }}</div>{% endif %}
+    {% if cliente.telefono %}<div>Tel. {{ cliente.telefono }}</div>{% endif %}
+  </div>
+  <div>
+    <h2>Resumen</h2>
+    <div>Documentos pendientes: {{ pedidos | length }}</div>
+    <div>Condiciones: {{ "Contado" if cliente.dias_credito == 0 else cliente.dias_credito ~ " días" }}</div>
+    <div><strong>Saldo: {{ saldo | dinero }}</strong></div>
+    {% if a_favor > 0 %}<div>Saldo a favor: {{ a_favor | dinero }}</div>{% endif %}
+  </div>
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <th>Pedido</th><th>Fecha</th><th>Vence</th><th class="num">Días</th>
+      <th class="num">Total</th><th class="num">Abonado</th><th class="num">Saldo</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for p in pedidos %}
+    {% set dias = (hoy - p.fecha_vencimiento).days %}
+    <tr>
+      <td>{{ p.folio }}</td>
+      <td>{{ p.fecha_pedido.strftime("%d/%m/%Y") }}</td>
+      <td>{{ p.fecha_vencimiento.strftime("%d/%m/%Y") }}</td>
+      <td class="num {{ 'vencido' if dias > 0 }}">{{ dias if dias > 0 else "" }}</td>
+      <td class="num">{{ p.total | dinero }}</td>
+      <td class="num">{{ p.cobrado | dinero }}</td>
+      <td class="num">{{ p.saldo | dinero }}</td>
+    </tr>
+  {% else %}
+    <tr><td colspan="7">Sin saldos pendientes. Gracias por su preferencia.</td></tr>
+  {% endfor %}
+  </tbody>
+  <tfoot>
+    <tr><th colspan="6" class="num">Total adeudado</th><th class="num">{{ saldo | dinero }}</th></tr>
+  </tfoot>
+</table>
+
+<p class="pie">
+  Documento informativo generado el {{ hoy.strftime("%d/%m/%Y") }}. Si detecta alguna
+  diferencia, favor de comunicarse con nosotros.
+</p>
+{% endblock %}

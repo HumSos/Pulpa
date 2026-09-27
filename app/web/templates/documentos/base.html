@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block titulo %}Documento{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', path='impresion.css') }}">
+</head>
+<body>
+  <div class="acciones">
+    <button onclick="window.print()">Imprimir o guardar en PDF</button>
+    <a href="{{ regreso }}">Volver</a>
+  </div>
+
+  <div class="hoja">
+    <div class="membrete">
+      <div>
+        <h1>{{ empresa.nombre }}</h1>
+        {% if empresa.direccion %}<div>{{ empresa.direccion }}</div>{% endif %}
+        {% if empresa.telefono %}<div>Tel. {{ empresa.telefono }}</div>{% endif %}
+        {% if empresa.rfc %}<div>RFC {{ empresa.rfc }}</div>{% endif %}
+      </div>
+      <div class="doc">
+        <strong>{% block documento %}{% endblock %}</strong>
+        <div>{% block folio %}{% endblock %}</div>
+        <div>{{ hoy.strftime("%d/%m/%Y") }}</div>
+      </div>
+    </div>
+
+    {% block contenido %}{% endblock %}
+  </div>
+</body>
+</html>

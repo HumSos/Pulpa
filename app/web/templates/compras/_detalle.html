@@ -1,6 +1,9 @@
 <div class="encabezado">
   <h1>{{ orden.folio }} · {{ orden.proveedor.nombre }}</h1>
-  <span class="etiqueta etiqueta--{{ orden.estado.value }}">{{ orden.estado.value | capitalize }}</span>
+  <div class="en-linea">
+    <span class="etiqueta etiqueta--{{ orden.estado.value }}">{{ orden.estado.value | capitalize }}</span>
+    <a class="boton" href="/compras/{{ orden.id }}/orden" target="_blank">Imprimir orden</a>
+  </div>
 </div>
 
 <p>

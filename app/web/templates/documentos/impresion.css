@@ -1,0 +1,36 @@
+:root { --tinta: #161A18; --linea: #C9CEC6; }
+* { box-sizing: border-box; }
+body { margin: 0; padding: 1.5cm; background: #EDEFEA; color: var(--tinta);
+  font-family: "Segoe UI", system-ui, sans-serif; font-size: 12px; line-height: 1.4; }
+.hoja { background: #fff; padding: 1.4cm; max-width: 21cm; margin: 0 auto;
+  border: 1px solid var(--linea); }
+.membrete { display: flex; justify-content: space-between; gap: 2rem;
+  border-bottom: 2px solid var(--tinta); padding-bottom: .6rem; margin-bottom: 1rem; }
+.membrete h1 { font-size: 1.15rem; margin: 0 0 .2rem; }
+.membrete .doc { text-align: right; }
+.membrete .doc strong { font-size: 1.3rem; display: block; }
+.datos { display: grid; grid-template-columns: 1fr 1fr; gap: .8rem; margin-bottom: 1rem; }
+.datos h2 { font-size: .75rem; margin: 0 0 .2rem; color: #5B655E; font-weight: 600; }
+table { width: 100%; border-collapse: collapse; margin: .6rem 0; }
+th, td { padding: .35rem .45rem; border-bottom: 1px solid var(--linea); text-align: left; }
+th { background: #F1F3EF; font-size: .72rem; text-transform: none; }
+.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+tfoot th { border-top: 2px solid var(--tinta); border-bottom: 0; }
+.firmas { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; margin-top: 2.5rem; }
+.firma { border-top: 1px solid var(--tinta); padding-top: .3rem; text-align: center;
+  font-size: .75rem; }
+.pie { margin-top: 1.5rem; font-size: .7rem; color: #5B655E; }
+.acciones { max-width: 21cm; margin: 0 auto 1rem; display: flex; gap: .6rem; }
+.acciones button, .acciones a { font: inherit; font-size: .85rem; background: #1C5240;
+  color: #fff; border: 0; border-radius: 6px; padding: .4rem .8rem; cursor: pointer;
+  text-decoration: none; }
+.vencido { color: #9C2B24; font-weight: 600; }
+
+@media print {
+  body { background: #fff; padding: 0; font-size: 11px; }
+  .hoja { border: 0; padding: 0; max-width: none; }
+  .acciones { display: none; }
+  thead { display: table-header-group; }
+  tr { break-inside: avoid; }
+  @page { margin: 1.2cm; }
+}
