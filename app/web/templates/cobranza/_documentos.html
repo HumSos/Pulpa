@@ -1,0 +1,30 @@
+{% if contraparte_id %}
+<h2>Repartir entre {{ "notas pendientes" if es_cobro else "órdenes pendientes" }}</h2>
+<p class="nota">
+  Pendiente total {{ pendiente | dinero }}.
+  Si dejas los abonos vacíos, se aplica de la más antigua a la más reciente.
+  Lo que sobre queda como saldo a favor.
+</p>
+<table>
+  <thead>
+    <tr>
+      <th>Documento</th><th>Fecha</th><th class="num">Saldo</th><th>Abono</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for d in documentos %}
+    <tr>
+      <td>{{ d.folio }}</td>
+      <td>{{ (d.fecha_pedido if es_cobro else d.fecha).strftime("%d/%m/%Y") }}</td>
+      <td class="num">{{ d.saldo | dinero }}</td>
+      <td>
+        <input name="abono_{{ d.id }}" inputmode="decimal" size="10"
+               placeholder="{{ d.saldo }}">
+      </td>
+    </tr>
+  {% else %}
+    <tr><td colspan="4">Esta contraparte no tiene documentos pendientes.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endif %}

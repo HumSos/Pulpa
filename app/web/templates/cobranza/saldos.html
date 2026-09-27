@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block titulo %}Saldos a favor{% endblock %}
+{% block contenido %}
+<p><a href="/cobranza">Volver a cobranza</a></p>
+<h1>Saldos a favor de clientes</h1>
+<p class="nota">Dinero cobrado que todavía no se aplica a ninguna nota.</p>
+
+<section id="resumen">
+{% for p in pagos %}
+<h2>{{ p.contraparte }} · {{ p.disponible | dinero }} disponible</h2>
+<p class="nota">
+  {{ p.folio }} del {{ p.fecha.strftime("%d/%m/%Y") }},
+  {{ p.metodo.value }} {{ p.referencia or "" }}
+</p>
+{% if pendientes[p.id] %}
+<form class="en-linea" hx-post="/cobranza/{{ p.id }}/aplicar" hx-target="#resumen">
+  <label>Aplicar a
+    <select name="documento_id" required>
+      {% for d in pendientes[p.id] %}
+      <option value="{{ d.id }}">{{ d.folio }} · saldo {{ d.saldo }}</option>
+      {% endfor %}
+    </select>
+  </label>
+  <label>Monto <input name="monto" inputmode="decimal" required size="10"></label>
+  <button type="submit">Aplicar</button>
+</form>
+{% else %}
+<p>Este cliente no tiene notas pendientes.</p>
+{% endif %}
+{% else %}
+<p>No hay saldos a favor.</p>
+{% endfor %}
+</section>
+{% endblock %}
