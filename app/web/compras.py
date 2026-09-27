@@ -205,7 +205,7 @@ def registrar_pago(
         cantidad = leer_decimal(monto)
         if cantidad is None:
             raise DatoInvalidoError("Captura el monto del pago")
-        servicio_pagos.registrar_pago(
+        servicio_pagos.pago_de_orden(
             db,
             orden.id,
             cantidad,
@@ -224,7 +224,7 @@ def registrar_pago(
 def eliminar_pago(request: Request, db: DbSession, orden_id: int, pago_id: int):
     orden = _obtener(db, orden_id)
     try:
-        servicio_pagos.eliminar_pago(db, orden.id, pago_id)
+        servicio_pagos.quitar_pago(db, orden.id, pago_id)
         db.commit()
     except DatoInvalidoError as error:
         db.rollback()

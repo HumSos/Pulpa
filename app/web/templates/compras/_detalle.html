@@ -92,16 +92,21 @@
 <table>
   <thead><tr><th>Fecha</th><th>Método</th><th>Referencia</th><th class="num">Monto</th><th></th></tr></thead>
   <tbody>
-  {% for p in orden.pagos %}
+  {% for a in orden.aplicaciones %}
     <tr>
-      <td>{{ p.fecha.strftime("%d/%m/%Y") }}</td>
-      <td>{{ p.metodo.value | capitalize }}</td>
-      <td>{{ p.referencia or "" }}</td>
-      <td class="num">{{ p.monto | dinero }}</td>
+      <td>{{ a.pago.fecha.strftime("%d/%m/%Y") }}</td>
+      <td>
+        {{ a.pago.metodo.value | capitalize }}
+        {% if a.pago.aplicaciones | length > 1 %}
+        <span class="etiqueta">{{ a.pago.folio }} cubre varias órdenes</span>
+        {% endif %}
+      </td>
+      <td>{{ a.pago.referencia or "" }}</td>
+      <td class="num">{{ a.monto | dinero }}</td>
       <td>
         <button class="secundario" hx-target="#orden"
-                hx-confirm="¿Eliminar este pago de {{ p.monto | dinero }}?"
-                hx-post="/compras/{{ orden.id }}/pagos/{{ p.id }}/eliminar">Eliminar</button>
+                hx-confirm="¿Eliminar este pago de {{ a.monto | dinero }}?"
+                hx-post="/compras/{{ orden.id }}/pagos/{{ a.id }}/eliminar">Eliminar</button>
       </td>
     </tr>
   {% else %}

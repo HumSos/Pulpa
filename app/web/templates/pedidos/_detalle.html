@@ -77,16 +77,21 @@
 <table>
   <thead><tr><th>Fecha</th><th>Método</th><th>Referencia</th><th class="num">Monto</th><th></th></tr></thead>
   <tbody>
-  {% for c in pedido.cobros %}
+  {% for a in pedido.aplicaciones %}
     <tr>
-      <td>{{ c.fecha.strftime("%d/%m/%Y") }}</td>
-      <td>{{ c.metodo.value | capitalize }}</td>
-      <td>{{ c.referencia or "" }}</td>
-      <td class="num">{{ c.monto | dinero }}</td>
+      <td>{{ a.pago.fecha.strftime("%d/%m/%Y") }}</td>
+      <td>
+        {{ a.pago.metodo.value | capitalize }}
+        {% if a.pago.aplicaciones | length > 1 %}
+        <span class="etiqueta">{{ a.pago.folio }} cubre varias notas</span>
+        {% endif %}
+      </td>
+      <td>{{ a.pago.referencia or "" }}</td>
+      <td class="num">{{ a.monto | dinero }}</td>
       <td>
         <button class="secundario" hx-target="#pedido"
-                hx-confirm="¿Eliminar este cobro de {{ c.monto | dinero }}?"
-                hx-post="/pedidos/{{ pedido.id }}/cobros/{{ c.id }}/eliminar">Eliminar</button>
+                hx-confirm="¿Eliminar este cobro de {{ a.monto | dinero }}?"
+                hx-post="/pedidos/{{ pedido.id }}/cobros/{{ a.id }}/eliminar">Eliminar</button>
       </td>
     </tr>
   {% else %}

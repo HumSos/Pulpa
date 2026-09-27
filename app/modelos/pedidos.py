@@ -12,7 +12,7 @@ from app.modelos.clientes import Cliente, DireccionEntrega
 from app.tipos import DecimalFijo
 
 if TYPE_CHECKING:
-    from app.modelos.pagos import CobroCliente
+    from app.modelos.pagos import AplicacionPago
 
 
 class EstadoPedido(StrEnum):
@@ -55,13 +55,13 @@ class PedidoCliente(ConTiempos, Base):
         cascade="all, delete-orphan",
         order_by="PedidoClienteLinea.id",
     )
-    cobros: Mapped[list["CobroCliente"]] = relationship(
-        back_populates="pedido", cascade="all, delete-orphan", order_by="CobroCliente.fecha"
+    aplicaciones: Mapped[list["AplicacionPago"]] = relationship(
+        back_populates="pedido", cascade="all, delete-orphan", order_by="AplicacionPago.id"
     )
 
     @property
     def cobrado(self) -> Decimal:
-        return sum((cobro.monto for cobro in self.cobros), Decimal("0.00"))
+        return sum((a.monto for a in self.aplicaciones), Decimal("0.00"))
 
     @property
     def saldo(self) -> Decimal:

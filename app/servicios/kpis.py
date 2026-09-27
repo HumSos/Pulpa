@@ -7,15 +7,15 @@ from sqlalchemy.orm import Session
 
 from app.modelos import (
     Cliente,
-    CobroCliente,
     EstadoCompra,
     EstadoPedido,
     OrdenCompra,
     OrdenCompraLinea,
-    PagoProveedor,
+    Pago,
     PedidoCliente,
     PedidoClienteLinea,
     Producto,
+    TipoMovimiento,
 )
 
 CERO = Decimal("0.00")
@@ -91,8 +91,9 @@ def compras_del_periodo(db: Session, periodo: Periodo) -> Decimal:
 def cobrado_del_periodo(db: Session, periodo: Periodo) -> Decimal:
     return _escalar(
         db,
-        select(func.sum(CobroCliente.monto)).where(
-            CobroCliente.fecha.between(periodo.desde, periodo.hasta)
+        select(func.sum(Pago.monto)).where(
+            Pago.tipo == TipoMovimiento.COBRO,
+            Pago.fecha.between(periodo.desde, periodo.hasta),
         ),
     )
 
@@ -100,8 +101,9 @@ def cobrado_del_periodo(db: Session, periodo: Periodo) -> Decimal:
 def pagado_del_periodo(db: Session, periodo: Periodo) -> Decimal:
     return _escalar(
         db,
-        select(func.sum(PagoProveedor.monto)).where(
-            PagoProveedor.fecha.between(periodo.desde, periodo.hasta)
+        select(func.sum(Pago.monto)).where(
+            Pago.tipo == TipoMovimiento.PAGO,
+            Pago.fecha.between(periodo.desde, periodo.hasta),
         ),
     )
 
